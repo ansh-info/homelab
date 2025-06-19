@@ -1,0 +1,4 @@
+your_tailnet.tail__.ts.net {
+    reverse_proxy app:80
+    tls internal
+}
