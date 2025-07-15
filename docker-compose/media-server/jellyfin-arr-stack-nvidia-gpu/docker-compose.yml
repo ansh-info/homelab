@@ -120,14 +120,12 @@ services:
 
   jellyfin:
     image: lscr.io/linuxserver/jellyfin:latest
-    runtime: nvidia
     container_name: jellyfin
     environment:
       - PUID=1000
       - PGID=1000
       - TZ=Etc/UTC
-      - NVIDIA_VISIBLE_DEVICES=all
-      - NVIDIA_DRIVER_CAPABILITIES=all
+
     volumes:
       - /mnt/ssd/arr/jellyfin/config:/config
       - /mnt/ssd/arr/sonarr/tvseries:/data/tvshows
@@ -138,11 +136,11 @@ services:
       - 8096:8096
       - 8920:8920
       - 7359:7359/udp
-      - 1900:1900/udp # DLNA
-      - 5353:5353/udp # Discovery
-      - 32410:32410/udp # GDM network discovery
-      - 32412:32412/udp
-      - 32413:32413/udp
-      - 32414:32414/udp
-      - 32469:32469 # DLNA
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              capabilities: ["gpu"]
+              device_ids: ["0"]
     restart: unless-stopped
