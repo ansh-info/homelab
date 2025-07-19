@@ -2,11 +2,12 @@ name: Validate Docker Compose Stacks
 
 on:
   push:
-    paths:
-      - "docker-compose/**/docker-compose.yml"
+    branches:
+      - "**"
   pull_request:
-    paths:
-      - "docker-compose/**/docker-compose.yml"
+    branches:
+      - "**"
+  workflow_dispatch:
 
 jobs:
   validate:
