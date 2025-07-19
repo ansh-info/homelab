@@ -1,0 +1,48 @@
+name: Validate Docker Compose Stacks
+
+on:
+  push:
+    branches:
+      - "**"
+  pull_request:
+    branches:
+      - "**"
+  workflow_dispatch:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        include:
+          - name: Jellyfin Stack (GPU)
+            path: docker-compose/media-server/jellyfin-arr-stack-nvidia-gpu
+            gpu: true
+            host_mounts: false
+
+          - name: Nextcloud Stack (host mounts)
+            path: docker-compose/nextcloud-reverse-proxy-tailscale
+            gpu: false
+            host_mounts: true
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Set Up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Validate docker-compose.yml for ${{ matrix.name }}
+        working-directory: ${{ matrix.path }}
+        run: docker compose config
+
+      - name: Run Docker Compose (non-GPU, no host mounts)
+        if: matrix.gpu == false && matrix.host_mounts == false
+        working-directory: ${{ matrix.path }}
+        run: docker compose up -d
+
+      - name: Tear Down Docker Compose (non-GPU, no host mounts)
+        if: matrix.gpu == false && matrix.host_mounts == false && always()
+        working-directory: ${{ matrix.path }}
+        run: docker compose down
