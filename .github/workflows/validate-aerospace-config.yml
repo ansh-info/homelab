@@ -27,11 +27,5 @@ jobs:
           curl -sSL https://github.com/pelletier/go-toml/releases/latest/download/toml-lint_linux_amd64.tar.gz | tar xz
           sudo mv toml-lint /usr/local/bin/
 
-      - name: Run toml-lint
-        run: toml-lint aerospace.toml
-
-      # Optional: Backup or deploy the config
-      # - name: Deploy config (example)
-      #   run: cp aerospace.toml $HOME/.config/aerospace/aerospace.toml
-
-      # You could also add a test run if AeroSpace ever supports a dry-run or validate mode
+      - name: Run toml-lint on aerospace config
+        run: toml-lint aerospace/aerospace.toml
