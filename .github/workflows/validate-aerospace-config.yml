@@ -2,13 +2,16 @@ name: Validate AeroSpace Config
 
 on:
   push:
-    paths:
-      - "aerospace/aerospace.toml"
     branches:
-      - main
-  pull_request:
+      - "**"
     paths:
       - "aerospace/aerospace.toml"
+  pull_request:
+    branches:
+      - "**"
+    paths:
+      - "aerospace/aerospace.toml"
+  workflow_dispatch:
 
 jobs:
   validate-config:
