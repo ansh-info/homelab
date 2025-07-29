@@ -1,3 +1,5 @@
+# ~/.config/kitty/kitty.conf
+
 # Font configuration
 font_family      JetBrains Mono Nerd Font
 bold_font        JetBrains Mono Nerd Font Bold
@@ -37,6 +39,36 @@ bell_on_tab no
 
 # Colors (Tokyo Night theme)
 # From https://github.com/folke/tokyonight.nvim
+background #1a1b26
+foreground #c0caf5
+selection_background #33467c
+selection_foreground #c0caf5
+url_color #73daca
+cursor #c0caf5
+
+# normal
+color0 #15161e
+color1 #f7768e
+color2 #9ece6a
+color3 #e0af68
+color4 #7aa2f7
+color5 #bb9af7
+color6 #7dcfff
+color7 #a9b1d6
+
+# bright
+color8 #414868
+color9 #f7768e
+color10 #9ece6a
+color11 #e0af68
+color12 #7aa2f7
+color13 #bb9af7
+color14 #7dcfff
+color15 #c0caf5
+
+# extended colors
+color16 #ff9e64
+color17 #db4b4b
 
 # URL settings
 url_style curly
@@ -46,6 +78,7 @@ url_prefixes http https file ftp gemini irc gopher mailto news git
 
 # Mouse
 mouse_hide_wait 3.0
+url_color #0087bd
 url_style curly
 open_url_modifiers kitty_mod
 open_url_with default
@@ -121,7 +154,3 @@ cursor_shape block
 cursor_blink true
 background_opacity 0.85
 
-# BEGIN_KITTY_THEME
-# Jet Brains Darcula
-include current-theme.conf
-# END_KITTY_THEME
