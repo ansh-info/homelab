@@ -1,10 +1,8 @@
--- ~/.config/nvim/mykittydarcula.lua
 vim.cmd("highlight clear")
 vim.o.background = "dark"
-vim.g.colors_name = "mykittydarcula"
+vim.g.colors_name = "jet_brains_darcula"
 
 local colors = {
-  bg = "#202020",
   fg = "#adadad",
   black = "#000000",
   red = "#fa5355",
@@ -22,22 +20,34 @@ local colors = {
   brmagenta = "#fb82ff",
   brcyan = "#60d3d1",
   brwhite = "#eeeeee",
-  sel_bg = "#eeeeee",
-  sel_fg = "#202020",
+
+  sel_bg = "#44475a",
+  sel_fg = "#ffffff",
   cursor_bg = "#ffffff",
-  tab_active_fg = "#eeeeee",
-  tab_active_bg = "#eeeeee",
-  tab_inactive_fg = "#adadad",
-  tab_inactive_bg = "#1a1a1a",
+
+  tab_active_fg = "#ffffff",
+  tab_active_bg = "#3c3c3c",
+  tab_inactive_fg = "#888888",
+  tab_inactive_bg = "#2a2a2a",
+
+  comment_fg = "#5c6370",
+  cursor_line_bg = "#333333",
+  statusline_bg = "#3c3c3c",
+  float_border = "#888888",
 }
 
+-- Utility highlight function
 local hi = function(group, opts)
   local cmd = "highlight " .. group
   if opts.fg then
     cmd = cmd .. " guifg=" .. opts.fg
   end
-  if opts.bg then
-    cmd = cmd .. " guibg=" .. opts.bg
+  if opts.bg ~= nil then
+    if opts.bg == false then
+      cmd = cmd .. " guibg=NONE"
+    else
+      cmd = cmd .. " guibg=" .. opts.bg
+    end
   end
   if opts.style then
     cmd = cmd .. " gui=" .. opts.style
@@ -45,59 +55,86 @@ local hi = function(group, opts)
   vim.cmd(cmd)
 end
 
-hi("Normal", { fg = colors.fg, bg = colors.bg })
-hi("Cursor", { fg = colors.bg, bg = colors.cursor_bg })
+-- Base editor
+hi("Normal", { fg = colors.fg, bg = false })
+hi("NormalNC", { fg = colors.fg, bg = false })
+hi("Cursor", { fg = "#000000", bg = colors.cursor_bg })
 hi("Visual", { fg = colors.sel_fg, bg = colors.sel_bg })
 hi("VisualNOS", { bg = colors.sel_bg })
-hi("LineNr", { fg = colors.brblack, bg = colors.bg })
-hi("CursorLine", { bg = "#262626" })
-hi("CursorLineNr", { fg = colors.fg, bg = "#262626", style = "bold" })
-hi("StatusLine", { fg = colors.fg, bg = "#262626" })
+hi("LineNr", { fg = colors.brblack, bg = false })
+hi("CursorLine", { bg = colors.cursor_line_bg })
+hi("CursorLineNr", { fg = "#eeeeee", bg = colors.cursor_line_bg, style = "bold" })
+
+-- Statusline / Tabs
+hi("StatusLine", { fg = colors.fg, bg = colors.statusline_bg })
 hi("StatusLineNC", { fg = colors.tab_inactive_fg, bg = colors.tab_inactive_bg })
 hi("TabLine", { fg = colors.tab_inactive_fg, bg = colors.tab_inactive_bg })
 hi("TabLineSel", { fg = colors.tab_active_fg, bg = colors.tab_active_bg })
 hi("TabLineFill", { fg = colors.tab_inactive_fg, bg = colors.tab_inactive_bg })
 
--- Standard 16-color ui
-hi("Normal", { fg = colors.fg, bg = colors.bg })
-hi("Comment", { fg = colors.brblack, bg = colors.bg, style = "italic" })
-hi("Constant", { fg = colors.cyan, bg = colors.bg })
-hi("String", { fg = colors.green, bg = colors.bg })
-hi("Character", { fg = colors.yellow, bg = colors.bg })
-hi("Number", { fg = colors.magenta, bg = colors.bg })
-hi("Boolean", { fg = colors.magenta, bg = colors.bg })
-hi("Identifier", { fg = colors.blue, bg = colors.bg })
-hi("Function", { fg = colors.blue, bg = colors.bg })
-hi("Statement", { fg = colors.red, bg = colors.bg })
-hi("Operator", { fg = colors.red, bg = colors.bg })
-hi("PreProc", { fg = colors.yellow, bg = colors.bg })
-hi("Type", { fg = colors.cyan, bg = colors.bg })
-hi("Special", { fg = colors.magenta, bg = colors.bg })
+-- Syntax
+-- hi("Comment", { fg = colors.comment_fg, style = "italic" })
+-- hi("Comment", { fg = "#4a4a4a", style = "italic" })
+-- hi("Comment", { fg = "#3c3c3c", style = "italic" })
 
--- Diagnostic and LSP highlights (optional, can add more)
-hi("DiagnosticError", { fg = colors.red, bg = colors.bg })
-hi("DiagnosticWarn", { fg = colors.yellow, bg = colors.bg })
-hi("DiagnosticInfo", { fg = colors.blue, bg = colors.bg })
-hi("DiagnosticHint", { fg = colors.cyan, bg = colors.bg })
+-- Warm dark orange comments and docstrings
+hi("Comment", { fg = "#cc7832", style = "italic" })
+hi("@comment", { fg = "#cc7832", style = "italic" })
+hi("@string.documentation", { fg = "#cc7832", style = "italic" })
+hi("TSComment", { fg = "#cc7832", style = "italic" })
+hi("TSStringDoc", { fg = "#cc7832", style = "italic" })
 
--- Float windows (used by file tree, LazyGit, etc.)
-hi("NormalFloat", { fg = colors.fg, bg = colors.bg }) -- or leave bg empty for transparency
-hi("FloatBorder", { fg = colors.fg, bg = colors.bg })
-hi("Pmenu", { fg = colors.fg, bg = colors.bg })
+hi("Constant", { fg = colors.cyan })
+hi("String", { fg = colors.green })
+hi("Character", { fg = colors.yellow })
+hi("Number", { fg = colors.magenta })
+hi("Boolean", { fg = colors.magenta })
+hi("Identifier", { fg = colors.blue })
+hi("Function", { fg = colors.blue })
+hi("Statement", { fg = colors.red })
+hi("Operator", { fg = colors.red })
+hi("PreProc", { fg = colors.yellow })
+hi("Type", { fg = colors.cyan })
+hi("Special", { fg = colors.magenta })
+
+-- Diagnostics / LSP
+hi("DiagnosticError", { fg = colors.red })
+hi("DiagnosticWarn", { fg = colors.yellow })
+hi("DiagnosticInfo", { fg = colors.blue })
+hi("DiagnosticHint", { fg = colors.cyan })
+hi("DiagnosticFloat", { fg = colors.fg, bg = false })
+
+-- Floating windows
+hi("NormalFloat", { fg = colors.fg, bg = false })
+hi("FloatBorder", { fg = colors.float_border, bg = false })
+hi("Pmenu", { fg = colors.fg, bg = false })
 hi("PmenuSel", { fg = colors.sel_fg, bg = colors.sel_bg })
 
--- Neo-tree or NvimTree specific
-hi("NeoTreeNormal", { fg = colors.fg, bg = colors.bg })
-hi("NeoTreeNormalNC", { fg = colors.fg, bg = colors.bg })
-hi("NeoTreeFloatBorder", { fg = colors.fg, bg = colors.bg })
+-- Tree plugins
+hi("NeoTreeNormal", { fg = colors.fg, bg = false })
+hi("NeoTreeNormalNC", { fg = colors.fg, bg = false })
+hi("NeoTreeFloatBorder", { fg = colors.float_border, bg = false })
 
 -- Telescope
-hi("TelescopeNormal", { fg = colors.fg, bg = colors.bg })
-hi("TelescopeBorder", { fg = colors.fg, bg = colors.bg })
+hi("TelescopeNormal", { fg = colors.fg, bg = false })
+hi("TelescopeBorder", { fg = colors.float_border, bg = false })
 
--- LazyGit (uses float)
-hi("LazyNormal", { fg = colors.fg, bg = colors.bg })
+-- LazyGit
+hi("LazyNormal", { fg = colors.fg, bg = false })
 
--- LSP floating windows and popups
-hi("NormalNC", { fg = colors.fg, bg = colors.bg })
-hi("DiagnosticFloat", { fg = colors.fg, bg = colors.bg })
+-- Snacks.nvim (custom file explorer)
+hi("SnackExplorerSelection", { bg = false }) -- remove selection background
+hi("SnackExplorerFocusedLine", { bg = false }) -- optional: dim or keep transparent
+hi("SnackExplorerLine", { bg = false }) -- fallback for line-level bg
+hi("CursorLine", { bg = "#333333" }) -- if snacks uses CursorLine
+hi("SnackExplorerSelection", { bg = "#2e2e2e" }) -- subtle highlight
+
+-- Make Neo-tree cursor line transparent or dim
+hi("NeoTreeCursorLine", { bg = false }) -- fully transparent
+-- OR if you want a subtle line:
+-- hi("NeoTreeCursorLine", { bg = "#2f2f2f" })
+
+-- Optional: cleanup icons if needed
+hi("NeoTreeFileName", { fg = colors.fg, bg = false })
+hi("NeoTreeFileNameOpened", { fg = colors.fg, bg = false })
+hi("NeoTreeSymbolicLinkTarget", { fg = colors.cyan, bg = false })
