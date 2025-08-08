@@ -1,0 +1,122 @@
+# Save this to ~/Library/Application Support/lazygit/config.yml
+
+gui:
+  # UI Settings
+  scrollHeight: 2 # Lines to scroll with each mouse wheel movement
+  scrollPastBottom: true # Allow scrolling beyond the bottom
+  sidePanelWidth: 0.3333 # Width of side panel (fraction of total width)
+  expandFocusedSidePanel: true # Expand side panel when focused
+  mainPanelSplitMode: 'flexible' # Options: 'split' | 'flexible' | 'solid'
+  language: 'en' # Options: 'en', 'pl', 'nl', etc
+  timeFormat: '02 Jan 06' # Time format for commit dates
+  theme:
+    lightTheme: false # Set to true for light terminal backgrounds
+    activeBorderColor:
+      - '#98c379' # green
+      - bold
+    inactiveBorderColor:
+      - '#abb2bf' # white
+    optionsTextColor:
+      - '#61afef' # blue
+    selectedLineBgColor:
+      - '#2c313c' # dark blue
+    selectedRangeBgColor:
+      - '#2c313c' # dark blue
+    cherryPickedCommitBgColor:
+      - '#2c313c'
+    cherryPickedCommitFgColor:
+      - '#98c379'
+    unstagedChangesColor:
+      - red # Color for unstaged changes
+  # Other UI Features
+  showFileTree: true # Show file tree instead of file list
+  showRandomTip: true # Show random tip at startup
+  showCommandLog: true # Show command log
+  showBottomLine: true # Show bottom line
+  showIcons: true # Show icons in list views
+  nerdFontsVersion: "3" # Specify nerd fonts version if you use them
+git:
+  paging:
+    colorArg: always # Always show colors in git output
+    useConfig: false # Don't use git's paging config
+  merging:
+    manualCommit: false # Create merge commits manually
+    args: "" # Additional arguments for git merge
+  pull:
+    mode: 'merge' # Options: 'merge' | 'rebase' | 'ff-only'
+  skip:
+    hookPrefix: "WIP" # Prefix to skip git hooks
+  autoFetch: true # Automatically fetch from remote
+  autoRefresh: true # Automatically refresh when git state changes
+  branchLogCmd: "git log --graph --color=always --abbrev-commit --decorate --date=relative --pretty=medium {{branchName}} --"
+  overrideGpg: false # Don't override GPG settings
+  # Commit message settings
+  commit:
+    signOff: false # Add 'Signed-off-by' line to commit messages
+    autoWrap: true # Automatically wrap commit messages
+  allBranchesLogCmds:
+    - git log --graph --all --color=always --abbrev-commit --decorate --date=relative --pretty=medium
+keybinding:
+  universal:
+    quit: 'q'
+    quit-alt1: '<c-c>'
+    return: '<esc>'
+    quitWithoutChangingDirectory: 'Q'
+    togglePanel: '<tab>'
+    prevItem: '<up>'
+    nextItem: '<down>'
+    prevBlock: '<left>'
+    nextBlock: '<right>'
+    nextMatch: 'n'
+    prevMatch: 'N'
+    startSearch: '/'
+    optionMenu: '?'
+    edit: 'e'
+    scroll: '<c-y>'
+    fullscreen: '<c-f>'
+    confirm: '<enter>'
+    remove: 'd'
+    new: 'n'
+  files:
+    ignoreFile: 'i'
+    commitChanges: 'c'
+    commitChangesWithEditor: 'C'
+    amendLastCommit: 'A'
+    stageAll: '<c-a>'
+    viewStashOptions: 's'
+    toggleStagedAll: 'a'
+    refreshFiles: 'r'
+  branches:
+    createPullRequest: 'o'
+    checkoutBranchByName: 'c'
+    forceCheckoutBranch: 'F'
+    rebaseBranch: 'r'
+    mergeIntoCurrentBranch: 'M'
+    viewGitFlowOptions: 'i'
+    fastForward: 'f'
+    createTag: 'T'
+    pushTag: 'P'
+  commits:
+    squashDown: 's'
+    renameCommit: 'r'
+    renameCommitWithEditor: 'R'
+    viewResetOptions: 'g'
+    markCommitAsFixup: 'f'
+    createFixupCommit: 'F'
+    squashAboveCommits: 'S'
+    moveDownCommit: '<c-j>'
+    moveUpCommit: '<c-k>'
+    amendToCommit: 'A'
+    pickCommit: 'p'
+    revertCommit: 't'
+    cherryPickCopy: 'c'
+    cherryPickCopyRange: 'C'
+    pasteCommits: 'v'
+notARepository: 'prompt' # Options: 'prompt' | 'create' | 'skip'
+customCommands:
+  - key: "C"
+    command: "git cz"
+    context: "files"
+    description: "commit with commitizen"
+    loadingText: "opening commitizen commit tool"
+    output: terminal
