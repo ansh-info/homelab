@@ -1,36 +1,46 @@
-# powerlevel10k configuration
+# ===== Powerlevel10k Instant Prompt (keep at very top) =====
 if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
   source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
 fi
 
+# ===== Paths (your originals, consolidated) =====
+export PATH="/opt/homebrew/opt/openjdk@21/bin:/Library/TeX/texbin:/Applications/Docker.app/Contents/Resources/bin:/opt/homebrew/bin:/usr/bin:/bin:/usr/sbin:/sbin:$PATH"
+export JAVA_HOME="/opt/homebrew/opt/openjdk@21"
+export CPPFLAGS="-I/opt/homebrew/opt/openjdk@21/include"
 
-# enable extended globbing
+# ===== Oh My Zsh setup =====
 export ZSH="$HOME/.oh-my-zsh"
-
-# powerlevel10k theme
 ZSH_THEME="powerlevel10k/powerlevel10k"
 
-# additional plugins
-autoload -Uz compinit
-compinit
+# Keep your plugin set; syntax-highlighting is sourced manually later.
+plugins=(git zsh-autosuggestions docker kubectl npm pip)
 
-# Enable cache for completions
+# Optional: disable OMZ auto-update checks
+zstyle ':omz:update' mode disabled
+
+# ===== Completions (single, cached compinit; macOS-safe, no console output) =====
+autoload -Uz compinit
+zmodload zsh/stat
+if [[ -f ~/.zcompdump-$ZSH_VERSION ]]; then
+  local _zcd_mtime
+  _zcd_mtime=$(zstat +mtime ~/.zcompdump-$ZSH_VERSION 2>/dev/null)
+  if (( EPOCHSECONDS - _zcd_mtime < 2592000 )); then
+    compinit -C -d ~/.zcompdump-$ZSH_VERSION
+  else
+    compinit -i -d ~/.zcompdump-$ZSH_VERSION
+  fi
+else
+  compinit -i -d ~/.zcompdump-$ZSH_VERSION
+fi
+
+# Your completion styles (kept)
 zstyle ':completion:*' use-cache on
 zstyle ':completion:*' cache-path "$HOME/.zcompcache"
-
-# Enable menu selection
 zstyle ':completion:*' menu select
-
-# Case-insensitive matching
 zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}'
-
-
-# Fuzzy matching for misspelled completions
 zstyle ':completion:*' completer _complete _match _approximate
 zstyle ':completion:*:match:*' original only
 zstyle ':completion:*:approximate:*' max-errors 1 numeric
-
-# Group matches and describe groups
 zstyle ':completion:*:*:*:*:*' menu select
 zstyle ':completion:*:matches' group 'yes'
 zstyle ':completion:*:options' description 'yes'
@@ -40,32 +50,32 @@ zstyle ':completion:*:descriptions' format ' %F{yellow}-- %d --%f'
 zstyle ':completion:*:messages' format ' %F{purple} -- %d --%f'
 zstyle ':completion:*:warnings' format ' %F{red}-- no matches found --%f'
 zstyle ':completion:*' format ' %F{yellow}-- %d --%f'
-
-# Colors in completion
+zstyle ':completion:*:*:kill:*:processes' list-colors '=(#b) #([0-9]#) ([0-9a-z-]#)*=01;34=0=01'
 zstyle ':completion:*' list-colors ${(s.:.)LS_COLORS}
 
-# Kill command completion
-zstyle ':completion:*:*:kill:*:processes' list-colors '=(#b) #([0-9]#) ([0-9a-z-]#)*=01;34=0=01'
+# Docker CLI adds completion functions into fpath (keep this)
+fpath=(/Users/anshkumar/.docker/completions $fpath)
 
-plugins=(git zsh-autosuggestions zsh-syntax-highlighting docker kubectl npm pip)
-
-# source oh-my-zsh
+# ===== Source Oh My Zsh (loads your plugins) =====
 source $ZSH/oh-my-zsh.sh
 
-# source zsh-syntax-highlighting
+# ===== Powerlevel10k speed knobs (before sourcing ~/.p10k.zsh) =====
+typeset -g POWERLEVEL9K_VCS_MAX_SYNC_LATENCY_SECONDS=0.2
+typeset -g POWERLEVEL9K_VCS_BACKENDS=(git)
+typeset -g POWERLEVEL9K_VCS_DISABLED_DIR_PATTERN='~/(Library|Movies|node_modules|.cache)(/|$)|/Volumes(/|$)'
+[[ -f ~/.p10k.zsh ]] && source ~/.p10k.zsh
+
+# ===== Prompt-related plugins order =====
+# zsh-autosuggestions via plugins; syntax-highlighting LAST:
 source /Users/anshkumar/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 
-# To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
-[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
-
-#Custom aliases
-# Set nvim as the default editor
+# ===== Editor & Aliases (your originals) =====
 export EDITOR='nvim'
 export VISUAL='nvim'
 alias v='nvim'
 alias vi='nvim'
 alias vim='nvim'
-alias ls='colorls'
+alias ls='eza'
 alias zshrc='vi ~/.zshrc'
 alias conf='cd ~/.config/ && vi .'
 alias szshrc='source ~/.zshrc'
@@ -74,59 +84,47 @@ alias svenv='source venv/bin/activate'
 alias c='clear'
 alias y='yazi'
 alias brewup="brew update && brew upgrade && brew cleanup"
-
-# ssh
-alias homelab='ssh username@ip'
-
-# Zoxide interactive
+alias homelab='ssh homelab@yourip'
 alias zi='zoxide query --interactive'
+alias bat='cat'
 
-# >>> conda initialize >>>
-# !! Contents within this block are managed by 'conda init' !!
-__conda_setup="$('/opt/homebrew/Caskroom/miniconda/base/bin/conda' 'shell.zsh' 'hook' 2> /dev/null)"
-if [ $? -eq 0 ]; then
-    eval "$__conda_setup"
-else
-    if [ -f "/opt/homebrew/Caskroom/miniconda/base/etc/profile.d/conda.sh" ]; then
-        . "/opt/homebrew/Caskroom/miniconda/base/etc/profile.d/conda.sh"
-    else
-        export PATH="/opt/homebrew/Caskroom/miniconda/base/bin:$PATH"
-    fi
-fi
-unset __conda_setup
-# <<< conda initialize <<<
+# ===== Replace heavy manual completions with OMZ plugins =====
+# (Removed: docker/kubectl/npm/pip completion subprocesses)
 
-# completions
-# Enable docker completion if not already enabled
-if [ $commands[docker] ]; then
-    source <(docker completion zsh)
-fi
-
-# Node/npm completion
-if [ $commands[npm] ]; then
-    source <(npm completion)
-fi
-
-# Kubectl completion
-if [ $commands[kubectl] ]; then
-    source <(kubectl completion zsh)
-fi
-
-# pip completion
-if [ $commands[pip] ]; then
-    eval "$(pip completion --zsh)"
-fi
-
-# export nvm
+# ===== NVM (lazy load; preserves your default-node behavior) =====
 export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
-nvm use default &> /dev/null
+_lazy_nvm() { unset -f node npm npx nvm; [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"; }
+nvm()  { _lazy_nvm; command nvm "$@"; }
+node() { _lazy_nvm; command node "$@"; }
+npm()  { _lazy_nvm; command npm  "$@"; }
+npx()  { _lazy_nvm; command npx  "$@"; }
+# Emulate "nvm use default" once per session without startup cost
+_nvm_use_default_once() {
+  unset -f _nvm_use_default_once
+  command -v nvm >/dev/null || _lazy_nvm
+  nvm use default &>/dev/null
+}
+precmd_functions+=(_nvm_use_default_once)
 
-# JDK Runtime@21
-export PATH="/opt/homebrew/opt/openjdk@21/bin:$PATH"
-export JAVA_HOME="/opt/homebrew/opt/openjdk@21"
-export CPPFLAGS="-I/opt/homebrew/opt/openjdk@21/include"
+# ===== Conda (lazy; base not auto-activated) =====
+# Run once:  conda config --set auto_activate_base false
+_lazy_conda() {
+  unset -f conda
+  __conda_setup="$('/opt/homebrew/Caskroom/miniconda/base/bin/conda' shell.zsh hook 2>/dev/null)"
+  eval "$__conda_setup"
+  unset __conda_setup
+}
+conda() { _lazy_conda; command conda "$@"; }
 
-# Zoxide
+# ===== zoxide (kept) =====
 eval "$(zoxide init zsh)"
+
+# ===== uv / uvx completions (kept, gated) =====
+command -v uv  >/dev/null && eval "$(uv generate-shell-completion zsh)"
+command -v uvx >/dev/null && eval "$(uvx --generate-shell-completion zsh)"
+
+# ===== Built-in clear (instant) =====
+bindkey '^L' clear-screen
+
+# ===== Load secrets (keep API keys out of this file) =====
+[[ -f "$HOME/.secrets.zsh" ]] && source "$HOME/.secrets.zsh"
