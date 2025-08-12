@@ -84,7 +84,7 @@ alias svenv='source venv/bin/activate'
 alias c='clear'
 alias y='yazi'
 alias brewup="brew update && brew upgrade && brew cleanup"
-alias homelab='ssh homelab@100.123.147.108'
+alias homelab='ssh homelab@yourip'
 alias zi='zoxide query --interactive'
 alias bat='cat'
 
