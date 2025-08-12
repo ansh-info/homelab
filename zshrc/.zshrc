@@ -19,16 +19,11 @@ plugins=(git zsh-autosuggestions docker kubectl npm pip)
 zstyle ':omz:update' mode disabled
 
 # ===== Completions (single, cached compinit; macOS-safe, no console output) =====
+# --- Completions (quiet, cached) ---
 autoload -Uz compinit
-zmodload zsh/stat
-if [[ -f ~/.zcompdump-$ZSH_VERSION ]]; then
-  local _zcd_mtime
-  _zcd_mtime=$(zstat +mtime ~/.zcompdump-$ZSH_VERSION 2>/dev/null)
-  if (( EPOCHSECONDS - _zcd_mtime < 2592000 )); then
-    compinit -C -d ~/.zcompdump-$ZSH_VERSION
-  else
-    compinit -i -d ~/.zcompdump-$ZSH_VERSION
-  fi
+# Use cached dump if present; skip the audit (-C) for speed
+if [[ -r ~/.zcompdump-$ZSH_VERSION ]]; then
+  compinit -C -d ~/.zcompdump-$ZSH_VERSION
 else
   compinit -i -d ~/.zcompdump-$ZSH_VERSION
 fi
@@ -106,15 +101,20 @@ _nvm_use_default_once() {
 }
 precmd_functions+=(_nvm_use_default_once)
 
-# ===== Conda (lazy; base not auto-activated) =====
-# Run once:  conda config --set auto_activate_base false
-_lazy_conda() {
-  unset -f conda
-  __conda_setup="$('/opt/homebrew/Caskroom/miniconda/base/bin/conda' shell.zsh hook 2>/dev/null)"
-  eval "$__conda_setup"
-  unset __conda_setup
-}
-conda() { _lazy_conda; command conda "$@"; }
+# >>> conda initialize >>>
+# !! Contents within this block are managed by 'conda init' !!
+__conda_setup="$('/opt/homebrew/Caskroom/miniconda/base/bin/conda' 'shell.zsh' 'hook' 2> /dev/null)"
+if [ $? -eq 0 ]; then
+    eval "$__conda_setup"
+else
+    if [ -f "/opt/homebrew/Caskroom/miniconda/base/etc/profile.d/conda.sh" ]; then
+        . "/opt/homebrew/Caskroom/miniconda/base/etc/profile.d/conda.sh"
+    else
+        export PATH="/opt/homebrew/Caskroom/miniconda/base/bin:$PATH"
+    fi
+fi
+unset __conda_setup
+# <<< conda initialize <<<
 
 # ===== zoxide (kept) =====
 eval "$(zoxide init zsh)"
