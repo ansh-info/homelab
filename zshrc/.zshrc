@@ -1,4 +1,3 @@
-
 # ===== Powerlevel10k Instant Prompt (keep at very top) =====
 if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
   source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
@@ -190,79 +189,20 @@ fi
 
 cat > "$fname" <<'EOF'
 % !TeX TS-program = pdflatex
-\documentclass[11pt,a4paper]{article}
-
-% Encoding, fonts, and micro-typography
-\usepackage[T1]{fontenc}
-\usepackage[utf8]{inputenc} % Not needed for Lua/XeLaTeX
-\usepackage{lmodern}
-\usepackage{microtype}
-
-% Page layout
-\usepackage[a4paper,margin=1in]{geometry}
-
-% Math and symbols
-\usepackage{amsmath,amssymb,amsthm}
-
-% Figures, tables, colors
-\usepackage{graphicx}
-\usepackage{xcolor}
-\usepackage{booktabs}
-
-% Units and numbers
-\usepackage{siunitx}
-
-% Links and cross-references
-\usepackage{hyperref}
-\usepackage[nameinlink,capitalise,noabbrev]{cleveref}
-\hypersetup{
-colorlinks=true,
-linkcolor=blue,
-citecolor=magenta,
-urlcolor=blue
-}
-
-% Metadata
-\title{Your Title}
-\author{Your Name}
-\date{\today}
-
+\documentclass{article}
+\usepackage{amsmath,hyperref}
+\title{VimTeX Test} \author{You}
 \begin{document}
 \maketitle
 
-\begin{abstract}
-A short abstract describing the document.
-\end{abstract}
-
-\tableofcontents
-\newpage
-
-\section{Introduction}
 Hello, \LaTeX{} from VimTeX!
 
-\section{Math}
-Einstein's famous equation is shown in \cref{eq:einstein}.
-\begin{equation}\label{eq:einstein}
-E = mc^2
+\section{Equation}
+\begin{equation}\label{eq:test}
+  E = mc^2
 \end{equation}
 
-\section{Figure}
-\begin{figure}[h]
-\centering
-% \includegraphics[width=0.7\linewidth]{path/to/image}
-\caption{An example figure.}
-\label{fig:example}
-\end{figure}
-
-\section{Links}
-See \href{https://example.com}{a link}.
-
-\section{Conclusion}
-A brief conclusion.
-
-% \bibliographystyle{unsrt}
-% \bibliography{references}
-
+See Eq.~\ref{eq:test}. Visit \href{https://example.com}{a link}.
 \end{document}
 EOF
 
