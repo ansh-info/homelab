@@ -1,3 +1,4 @@
+
 # ===== Powerlevel10k Instant Prompt (keep at very top) =====
 if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
   source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
@@ -152,3 +153,118 @@ bindkey '^L' clear-screen
 
 # ===== Secrets (keep API keys out of this file) =====
 [[ -f "$HOME/.secrets.zsh" ]] && source "$HOME/.secrets.zsh"
+
+eval "$(/opt/homebrew/bin/brew shellenv)"
+eval "$(/opt/homebrew/bin/brew shellenv)"
+export PATH="/opt/homebrew/opt/perl/bin:$PATH"
+export PATH="/Library/TeX/texbin:$PATH"
+
+# Create a new LaTeX file from a template
+texnew() {
+local fname="$1"
+if [[ -z "$fname" ]]; then
+    printf "New LaTeX filename (without .tex): "
+    IFS= read -r fname
+fi
+if [[ -z "$fname" ]]; then
+    echo "Aborted: empty filename."
+    return 1
+fi
+
+# Ensure .tex extension
+
+[[ "$fname" != *.tex ]] && fname="${fname}.tex"
+
+# Confirm overwrite
+
+if [[ -e "$fname" ]]; then
+    if ! read -q "REPLY?File '$fname' exists. Overwrite? [y/N] "; then
+      echo
+      echo "Aborted."
+      return 1
+    fi
+    echo
+fi
+
+# Write template
+
+cat > "$fname" <<'EOF'
+% !TeX TS-program = pdflatex
+\documentclass[11pt,a4paper]{article}
+
+% Encoding, fonts, and micro-typography
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc} % Not needed for Lua/XeLaTeX
+\usepackage{lmodern}
+\usepackage{microtype}
+
+% Page layout
+\usepackage[a4paper,margin=1in]{geometry}
+
+% Math and symbols
+\usepackage{amsmath,amssymb,amsthm}
+
+% Figures, tables, colors
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{booktabs}
+
+% Units and numbers
+\usepackage{siunitx}
+
+% Links and cross-references
+\usepackage{hyperref}
+\usepackage[nameinlink,capitalise,noabbrev]{cleveref}
+\hypersetup{
+colorlinks=true,
+linkcolor=blue,
+citecolor=magenta,
+urlcolor=blue
+}
+
+% Metadata
+\title{Your Title}
+\author{Your Name}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+A short abstract describing the document.
+\end{abstract}
+
+\tableofcontents
+\newpage
+
+\section{Introduction}
+Hello, \LaTeX{} from VimTeX!
+
+\section{Math}
+Einstein's famous equation is shown in \cref{eq:einstein}.
+\begin{equation}\label{eq:einstein}
+E = mc^2
+\end{equation}
+
+\section{Figure}
+\begin{figure}[h]
+\centering
+% \includegraphics[width=0.7\linewidth]{path/to/image}
+\caption{An example figure.}
+\label{fig:example}
+\end{figure}
+
+\section{Links}
+See \href{https://example.com}{a link}.
+
+\section{Conclusion}
+A brief conclusion.
+
+% \bibliographystyle{unsrt}
+% \bibliography{references}
+
+\end{document}
+EOF
+
+echo "Created '$fname'. Open with: nvim '$fname'"
+}
