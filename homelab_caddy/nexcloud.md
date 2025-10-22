@@ -8,7 +8,7 @@ A step-by-step, **very detailed** guide to reproduce everything we did up to now
 ## 0) Assumptions & Names you’ll see below
 
 - **Server (Ubuntu) LAN IP (static):** `192.168.29.250`
-- **Server Tailscale IP (example):** `100.123.147.108`
+- **Server Tailscale IP (example):** `<tailscale-ip>`
 - **Private hostname:** `nextcloud.homelab.ansh.com`
 - **All traffic private:** No public DNS, no router port-forwarding. Access only via Tailscale.
 - **Docker & docker compose installed** on the server.
@@ -135,11 +135,11 @@ services:
       - "192.168.29.250:53:53/tcp"
       - "192.168.29.250:53:53/udp"
       # If you want Tailscale clients to use Pi-hole DNS remotely:
-      - "100.123.147.108:53:53/tcp"
-      - "100.123.147.108:53:53/udp"
+      - "<tailscale-ip>:53:53/tcp"
+      - "<tailscale-ip>:53:53/udp"
       # Admin UI (bind on both if you want to access via LAN or Tailnet)
       - "192.168.29.250:8081:80/tcp"
-      - "100.123.147.108:8081:80/tcp"
+      - "<tailscale-ip>:8081:80/tcp"
     volumes:
       - ./pihole/etc-pihole:/etc/pihole
     cap_add:
@@ -175,7 +175,7 @@ Pi-hole Admin → **Local DNS → DNS Records**:
 - If you want remote access over Tailscale (recommended):
 
   ```
-  nextcloud.homelab.ansh.com   100.123.147.108
+  nextcloud.homelab.ansh.com   <tailscale-ip>
   ```
 
 - (Optional) If you also want fast resolution on your LAN:
@@ -190,7 +190,7 @@ Pi-hole Admin → **Local DNS → DNS Records**:
 
 **Tailscale Admin → DNS**
 
-- **Nameserver:** `100.123.147.108` (your Pi-hole’s Tailscale IP)
+- **Nameserver:** `<tailscale-ip>` (your Pi-hole’s Tailscale IP)
 - **Restrict to domain (Split DNS):** `homelab.ansh.com`
 - (Optional) Enable “Override local DNS”.
 
@@ -198,7 +198,7 @@ Pi-hole Admin → **Local DNS → DNS Records**:
 
 ```bash
 dig nextcloud.homelab.ansh.com +short
-# expect 100.123.147.108 (and possibly 192.168.29.250 if you added both)
+# expect <tailscale-ip> (and possibly 192.168.29.250 if you added both)
 ```
 
 **Outcome:** Only Tailnet devices resolve your private domain; the rest of the world knows nothing.
@@ -344,7 +344,7 @@ curl -I https://nextcloud.homelab.ansh.com --insecure
 
 ```bash
 sudo ss -lunpt | grep ':53'
-# only 192.168.29.250:53 and/or 100.123.147.108:53; nothing on 0.0.0.0:53
+# only 192.168.29.250:53 and/or <tailscale-ip>:53; nothing on 0.0.0.0:53
 ```
 
 **Outcome:** Private DNS + private HTTPS path end-to-end, no public exposure.
