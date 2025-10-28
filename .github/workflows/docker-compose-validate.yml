@@ -16,15 +16,46 @@ jobs:
     strategy:
       matrix:
         include:
-          - name: Jellyfin Stack (GPU)
-            path: docker-compose/media-server/jellyfin-arr-stack-nvidia-gpu
-            gpu: true
-            host_mounts: false
-
-          - name: Nextcloud Stack (host mounts)
-            path: docker-compose/nextcloud-reverse-proxy-tailscale
+          - name: cloudflare-caddy/immich
+            path: docker-compose/cloudflare-caddy-reverse-proxy-tailscale/immich
             gpu: false
             host_mounts: true
+            upload_location: /tmp/immich/uploads
+            db_data_location: /tmp/immich/postgres
+            db_password: immich
+            db_username: immich
+            db_database_name: immich
+            tailscale_ip: 127.0.0.1
+          - name: cloudflare-caddy/pihole
+            path: docker-compose/cloudflare-caddy-reverse-proxy-tailscale/pihole
+            gpu: false
+            host_mounts: true
+            upload_location: /tmp/uploads-unused
+            db_data_location: /tmp/db-unused
+            db_password: placeholder
+            db_username: placeholder
+            db_database_name: placeholder
+            tailscale_ip: 127.0.0.1
+          - name: old-free/media-server/jellyfin-arr-stack-nvidia-gpu
+            path: docker-compose/old-free-tailscale-reverse-proxy/media-server/jellyfin-arr-stack-nvidia-gpu
+            gpu: true
+            host_mounts: true
+            upload_location: /tmp/uploads-unused
+            db_data_location: /tmp/db-unused
+            db_password: placeholder
+            db_username: placeholder
+            db_database_name: placeholder
+            tailscale_ip: 127.0.0.1
+          - name: old-free/nextcloud-reverse-proxy-tailscale
+            path: docker-compose/old-free-tailscale-reverse-proxy/nextcloud-reverse-proxy-tailscale
+            gpu: false
+            host_mounts: true
+            upload_location: /tmp/uploads-unused
+            db_data_location: /tmp/db-unused
+            db_password: placeholder
+            db_username: placeholder
+            db_database_name: placeholder
+            tailscale_ip: 127.0.0.1
 
     steps:
       - name: Checkout Code
@@ -33,16 +64,57 @@ jobs:
       - name: Set Up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
+      - name: Prepare docker-compose for ${{ matrix.name }}
+        id: prepare-compose
+        working-directory: ${{ matrix.path }}
+        env:
+          UPLOAD_LOCATION: ${{ matrix.upload_location }}
+          DB_DATA_LOCATION: ${{ matrix.db_data_location }}
+          DB_PASSWORD: ${{ matrix.db_password }}
+          DB_USERNAME: ${{ matrix.db_username }}
+          DB_DATABASE_NAME: ${{ matrix.db_database_name }}
+          TAILSCALE_IP: ${{ matrix.tailscale_ip }}
+        run: |
+          compose_args=""
+          if [ -f docker-compose.yml ] && grep -q "<tailscale-ip>" docker-compose.yml; then
+            tmp_file="docker-compose.ci.yml"
+            sed "s/<tailscale-ip>/${TAILSCALE_IP}/g" docker-compose.yml > "${tmp_file}"
+            echo "compose_args=-f ${tmp_file}" >> "$GITHUB_OUTPUT"
+          else
+            echo "compose_args=" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Validate docker-compose.yml for ${{ matrix.name }}
         working-directory: ${{ matrix.path }}
-        run: docker compose config
+        env:
+          UPLOAD_LOCATION: ${{ matrix.upload_location }}
+          DB_DATA_LOCATION: ${{ matrix.db_data_location }}
+          DB_PASSWORD: ${{ matrix.db_password }}
+          DB_USERNAME: ${{ matrix.db_username }}
+          DB_DATABASE_NAME: ${{ matrix.db_database_name }}
+          TAILSCALE_IP: ${{ matrix.tailscale_ip }}
+        run: docker compose ${{ steps.prepare-compose.outputs.compose_args }} config
 
       - name: Run Docker Compose (non-GPU, no host mounts)
         if: matrix.gpu == false && matrix.host_mounts == false
         working-directory: ${{ matrix.path }}
-        run: docker compose up -d
+        env:
+          UPLOAD_LOCATION: ${{ matrix.upload_location }}
+          DB_DATA_LOCATION: ${{ matrix.db_data_location }}
+          DB_PASSWORD: ${{ matrix.db_password }}
+          DB_USERNAME: ${{ matrix.db_username }}
+          DB_DATABASE_NAME: ${{ matrix.db_database_name }}
+          TAILSCALE_IP: ${{ matrix.tailscale_ip }}
+        run: docker compose ${{ steps.prepare-compose.outputs.compose_args }} up -d
 
       - name: Tear Down Docker Compose (non-GPU, no host mounts)
         if: matrix.gpu == false && matrix.host_mounts == false && always()
         working-directory: ${{ matrix.path }}
-        run: docker compose down
+        env:
+          UPLOAD_LOCATION: ${{ matrix.upload_location }}
+          DB_DATA_LOCATION: ${{ matrix.db_data_location }}
+          DB_PASSWORD: ${{ matrix.db_password }}
+          DB_USERNAME: ${{ matrix.db_username }}
+          DB_DATABASE_NAME: ${{ matrix.db_database_name }}
+          TAILSCALE_IP: ${{ matrix.tailscale_ip }}
+        run: docker compose ${{ steps.prepare-compose.outputs.compose_args }} down
