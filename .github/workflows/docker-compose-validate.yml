@@ -16,13 +16,20 @@ jobs:
     strategy:
       matrix:
         include:
-          - name: Jellyfin Stack (GPU)
-            path: docker-compose/media-server/jellyfin-arr-stack-nvidia-gpu
+          - name: cloudflare-caddy/immich
+            path: docker-compose/cloudflare-caddy-reverse-proxy-tailscale/immich
+            gpu: false
+            host_mounts: true
+          - name: cloudflare-caddy/pihole
+            path: docker-compose/cloudflare-caddy-reverse-proxy-tailscale/pihole
+            gpu: false
+            host_mounts: true
+          - name: old-free/media-server/jellyfin-arr-stack-nvidia-gpu
+            path: docker-compose/old-free-tailscale-reverse-proxy/media-server/jellyfin-arr-stack-nvidia-gpu
             gpu: true
-            host_mounts: false
-
-          - name: Nextcloud Stack (host mounts)
-            path: docker-compose/nextcloud-reverse-proxy-tailscale
+            host_mounts: true
+          - name: old-free/nextcloud-reverse-proxy-tailscale
+            path: docker-compose/old-free-tailscale-reverse-proxy/nextcloud-reverse-proxy-tailscale
             gpu: false
             host_mounts: true
 
