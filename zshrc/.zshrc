@@ -75,8 +75,6 @@ alias c='clear'
 alias y='yazi'
 # alias brewup="brew update && brew upgrade && brew cleanup"
 alias zi='zoxide query --interactive'
-alias bat='cat'
-
 
 # Smarter brew updater + uv completion refresh
 brewup() {
@@ -153,58 +151,16 @@ bindkey '^L' clear-screen
 # ===== Secrets (keep API keys out of this file) =====
 [[ -f "$HOME/.secrets.zsh" ]] && source "$HOME/.secrets.zsh"
 
+# configure LaTeX environment
+[[ -f "$HOME/.latex.zsh" ]] && source "$HOME/.latex.zsh"
+
 eval "$(/opt/homebrew/bin/brew shellenv)"
 eval "$(/opt/homebrew/bin/brew shellenv)"
 export PATH="/opt/homebrew/opt/perl/bin:$PATH"
 export PATH="/Library/TeX/texbin:$PATH"
 
-# Create a new LaTeX file from a template
-texnew() {
-local fname="$1"
-if [[ -z "$fname" ]]; then
-    printf "New LaTeX filename (without .tex): "
-    IFS= read -r fname
-fi
-if [[ -z "$fname" ]]; then
-    echo "Aborted: empty filename."
-    return 1
-fi
+# vim: set ft=zsh
+bindkey -v
 
-# Ensure .tex extension
-
-[[ "$fname" != *.tex ]] && fname="${fname}.tex"
-
-# Confirm overwrite
-
-if [[ -e "$fname" ]]; then
-    if ! read -q "REPLY?File '$fname' exists. Overwrite? [y/N] "; then
-      echo
-      echo "Aborted."
-      return 1
-    fi
-    echo
-fi
-
-# Write template
-
-cat > "$fname" <<'EOF'
-% !TeX TS-program = pdflatex
-\documentclass{article}
-\usepackage{amsmath,hyperref}
-\title{VimTeX Test} \author{You}
-\begin{document}
-\maketitle
-
-Hello, \LaTeX{} from VimTeX!
-
-\section{Equation}
-\begin{equation}\label{eq:test}
-  E = mc^2
-\end{equation}
-
-See Eq.~\ref{eq:test}. Visit \href{https://example.com}{a link}.
-\end{document}
-EOF
-
-echo "Created '$fname'. Open with: nvim '$fname'"
-}
+# For Apple Silicon Macs (M1, M2)
+export PATH="/opt/homebrew/bin:$PATH"
