@@ -1,5 +1,30 @@
 # More info at https://github.com/pi-hole/docker-pi-hole/ and https://docs.pi-hole.net/
 services:
+  wait-for-local-ip:
+    container_name: wait-for-local-ip
+    image: alpine:latest
+    command: >
+      sh -c "
+        echo 'Waiting for local IP ${LOCAL_IP} for up to ${TIMEOUT_SECONDS}s...';
+        end=$$(($$(date +%s) + $$TIMEOUT_SECONDS));
+        while [ $$(date +%s) -lt $$end ]; do
+          if ping -c1 -W1 $$LOCAL_IP >/dev/null 2>&1; then
+            echo 'Local IP $$LOCAL_IP is reachable.';
+            exit 0;
+          fi;
+          echo 'Local IP $$LOCAL_IP not reachable yet. Retrying in 5s...';
+          sleep 5;
+        done;
+        echo 'Timed out waiting for local IP $$LOCAL_IP.';
+        exit 1
+      "
+    environment:
+      # IP on your LAN you want to wait for (e.g. gateway or host IP)
+      LOCAL_IP: "192.168.29.250" # Staic ipv4_address: ip -> assigned
+      # 5 minutes = 300 seconds
+      TIMEOUT_SECONDS: "300"
+    restart: "no"
+
   pihole:
     container_name: pihole
     image: pihole/pihole:latest
@@ -23,12 +48,13 @@ services:
       - "<tailscale-ip>:53:53/udp"
       # Web UI (loopback-only; Caddy will front it)
       - "127.0.0.1:10081:80/tcp"
+
     hostname: pihole.local
     environment:
       # Set the appropriate timezone for your location (https://en.wikipedia.org/wiki/List_of_tz_database_time_zones), e.g:
       TZ: "Asia/Kolkata" # TZ: "Europe/Berlin"
       # Set a password to access the web interface. Not setting one will result in a random password being assigned
-      FTLCONF_webserver_api_password: "YourPassword"
+      FTLCONF_webserver_api_password: "${PIHOLE_PASSWORD}"
       # If using Docker's default `bridge` network setting the dns listening mode should be set to 'all'
       FTLCONF_dns_listeningMode: "all"
       PIHOLE_HOSTNAME: pihole
@@ -47,3 +73,5 @@ services:
       # Optional, if Pi-hole should get some more processing time
       - SYS_NICE
     restart: unless-stopped
+    depends_on:
+      - wait-for-local-ip
