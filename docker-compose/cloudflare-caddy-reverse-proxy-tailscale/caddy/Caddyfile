@@ -1,0 +1,71 @@
+{
+  # Optional: get expiry emails from Let's Encrypt
+  email your_email@gmail.com
+
+  # Use Cloudflare DNS-01, no public ports needed
+  acme_dns cloudflare {env.CLOUDFLARE_API_TOKEN}
+}
+
+# Pi-hole
+https://pihole.homelab.your-domain.com {
+  reverse_proxy localhost:10081
+}
+
+# Nextcloud
+https://nextcloud.homelab.your-domain.com {
+  reverse_proxy localhost:11000
+}
+
+# Immich
+https://immich.homelab.your-domain.com {
+  reverse_proxy localhost:12283
+}
+
+# --- ARR Apps ---
+https://radarr.homelab.your-domain.com {
+  reverse_proxy localhost:17878
+}
+
+https://sonarr.homelab.your-domain.com {
+  reverse_proxy localhost:18989
+}
+
+https://prowlarr.homelab.your-domain.com {
+  reverse_proxy localhost:19696
+}
+
+https://bazarr.homelab.your-domain.com {
+  reverse_proxy localhost:16767
+}
+
+https://lidarr.homelab.your-domain.com {
+  reverse_proxy localhost:18686
+}
+
+https://readarr.homelab.your-domain.com {
+  reverse_proxy localhost:18787
+}
+
+https://homarr.homelab.your-domain.com {
+  reverse_proxy localhost:17575
+}
+
+https://qbittorrent.homelab.your-domain.com {
+  reverse_proxy localhost:18080
+}
+
+# Jellyfin (Caddy handles websockets automatically)
+https://jellyfin.homelab.your-domain.com {
+  reverse_proxy localhost:18096
+}
+
+# Portainer (HTTPS backend with self-signed cert on host :19443)
+https://portainer.homelab.your-domain.com {
+  reverse_proxy https://localhost:19443 {
+    transport http {
+      tls_insecure_skip_verify
+      # If needed, you can set SNI explicitly:
+      # tls_server_name localhost
+    }
+  }
+}
