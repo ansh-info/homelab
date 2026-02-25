@@ -15,14 +15,13 @@ services:
       #- "67:67/udp"
       # Uncomment the line below if you are using Pi-hole as your NTP server
       #- "123:123/udp"
-      - "192.168.29.250:53:53/tcp"
-      - "192.168.29.250:53:53/udp"
-      # - "192.168.29.250:8081:80/tcp"   # UI at http://192.168.29.250:8080/admin
-      # - "<tailscale-ip>:8081:80/tcp"
-      - "<tailscale-ip>:53:53/tcp"
-      - "<tailscale-ip>:53:53/udp"
-      # Web UI (loopback-only; Caddy will front it)
-      - "127.0.0.1:10081:80/tcp"
+      - "53:53/tcp"
+      - "53:53/udp"
+
+      # Web UI (loopback-only; Ingres will front it)
+      # - "8081:80/tcp"
+    networks:
+      - proxy
 
     hostname: pihole.local
     environment:
@@ -36,7 +35,9 @@ services:
     # Volumes store your data between container upgrades
     volumes:
       # For persisting Pi-hole's databases and common configuration file
-      - "./etc-pihole:/etc/pihole"
+      # - "./etc-pihole:/etc/pihole"
+      - "/mnt/ssd/docker-compose/pihole/etc-pihole:/etc/pihole"
+      - "/mnt/ssd/docker-compose/pihole/etc-dnsmasq.d:/etc/dnsmasq.d"
       # Uncomment the below if you have custom dnsmasq config files that you want to persist. Not needed for most starting fresh with Pi-hole v6. If you're upgrading from v5 you and have used this directory before, you should keep it enabled for the first v6 container start to allow for a complete migration. It can be removed afterwards. Needs environment variable FTLCONF_misc_etc_dnsmasq_d: 'true'
       #- './etc-dnsmasq.d:/etc/dnsmasq.d'
     cap_add:
@@ -48,3 +49,7 @@ services:
       # Optional, if Pi-hole should get some more processing time
       - SYS_NICE
     restart: unless-stopped
+
+networks:
+  proxy:
+    external: true
