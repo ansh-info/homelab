@@ -10,8 +10,10 @@ services:
       - /mnt/ssd/arr/radarr/config:/config
       - /mnt/ssd/arr/radarr/movies:/data/movies
       - /mnt/ssd/arr/qbittorrent/downloads:/downloads
-    ports:
-      - 127.0.0.1:17878:7878
+    # ports:
+    #   - 7878:7878
+    networks:
+      - proxy
     restart: unless-stopped
 
   sonarr:
@@ -25,8 +27,10 @@ services:
       - /mnt/ssd/arr/sonarr/config:/config
       - /mnt/ssd/arr/sonarr/tvseries:/data/tvshows
       - /mnt/ssd/arr/qbittorrent/downloads:/downloads
-    ports:
-      - 127.0.0.1:18989:8989
+    # ports:
+    #   - 8989:8989
+    networks:
+      - proxy
     restart: unless-stopped
 
   prowlarr:
@@ -38,8 +42,10 @@ services:
       - TZ=Etc/UTC
     volumes:
       - /mnt/ssd/arr/prowlarr/config:/config
-    ports:
-      - 127.0.0.1:19696:9696
+    # ports:
+    #   - 9696:9696
+    networks:
+      - proxy
     restart: unless-stopped
 
   bazarr:
@@ -53,8 +59,10 @@ services:
       - /mnt/ssd/arr/bazarr/config:/config
       - /mnt/ssd/arr/radarr/movies:/data/movies
       - /mnt/ssd/arr/sonarr/tvseries:/data/tvshows
-    ports:
-      - 127.0.0.1:16767:6767
+    # ports:
+    #   - 6767:6767
+    networks:
+      - proxy
     restart: unless-stopped
 
   lidarr:
@@ -69,23 +77,23 @@ services:
       - /mnt/ssd/arr/lidarr/music:/data/music
       - /mnt/ssd/arr/qbittorrent/downloads:/downloads
     ports:
-      - 127.0.0.1:18686:8686
-    restart: unless-stopped
+      - 18686:8686
+  #   restart: unless-stopped
 
-  readarr:
-    image: lscr.io/linuxserver/readarr:amd64-nightly-0.4.0.2593-ls334
-    container_name: readarr
-    environment:
-      - PUID=1000
-      - PGID=1000
-      - TZ=Etc/UTC
-    volumes:
-      - /mnt/ssd/arr/readarr/config:/config
-      - /mnt/ssd/arr/readarr/books:/data/books
-      - /mnt/ssd/arr/qbittorrent/downloads:/downloads
-    ports:
-      - 127.0.0.1:18787:8787
-    restart: unless-stopped
+  # readarr: # depricated
+  #   image: lscr.io/linuxserver/readarr:amd64-nightly-0.4.0.2593-ls334
+  #   container_name: readarr
+  #   environment:
+  #     - PUID=1000
+  #     - PGID=1000
+  #     - TZ=Etc/UTC
+  #   volumes:
+  #     - /mnt/ssd/arr/readarr/config:/config
+  #     - /mnt/ssd/arr/readarr/books:/data/books
+  #     - /mnt/ssd/arr/qbittorrent/downloads:/downloads
+  #   ports:
+  #     - 18787:8787
+  #   restart: unless-stopped
 
   homarr:
     image: ghcr.io/ajnart/homarr:latest
@@ -97,8 +105,8 @@ services:
       - /mnt/ssd/arr/homarr/config:/app/data/configs
       - /mnt/ssd/arr/homarr/icons:/app/public/icons
       - /mnt/ssd/arr/homarr/data:/data
-    ports:
-      - 127.0.0.1:17575:7575
+  #   ports:
+  #     - 17575:7575
 
   qbittorrent:
     image: lscr.io/linuxserver/qbittorrent:latest
@@ -113,19 +121,24 @@ services:
       - /mnt/ssd/arr/qbittorrent/config:/config
       - /mnt/ssd/arr/qbittorrent/downloads:/downloads
     ports:
-      - 127.0.0.1:18080:8080
-      - 127.0.0.1:6881:6881
-      - 127.0.0.1:6881:6881/udp
+      # - 8080:8080
+      - 6881:6881
+      - 6881:6881/udp
+    networks:
+      - proxy
     restart: unless-stopped
 
   jellyfin:
     image: lscr.io/linuxserver/jellyfin:latest
     container_name: jellyfin
+    runtime: nvidia
+
     environment:
       - PUID=1000
       - PGID=1000
       - TZ=Etc/UTC
-
+      - NVIDIA_VISIBLE_DEVICES=all
+      - NVIDIA_DRIVER_CAPABILITIES=compute,video,utility
     volumes:
       - /mnt/ssd/arr/jellyfin/config:/config
       - /mnt/ssd/arr/sonarr/tvseries:/data/tvshows
@@ -133,10 +146,76 @@ services:
       - /mnt/ssd/arr/readarr/books:/data/books
       - /mnt/ssd/arr/lidarr/music:/data/music
     ports:
-      - 127.0.0.1:18096:8096
-      # - 8920:8920
-      # - 7359:7359/udp        # discovery
-      # - 1900:1900/udp        # SSDP (if you use DLNA)
+      # - 8096:8096
+      - 8920:8920
+      - 7359:7359/udp # discovery
+      - 1900:1900/udp # SSDP (if you use DLNA)
+    networks:
+      - proxy
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: nvidia
+    #           capabilities: ["gpu"]
+    #           device_ids: ["0"]
+    restart: unless-stopped
+
+  seerr:
+    image: ghcr.io/seerr-team/seerr:latest
+    container_name: seerr
+    init: true
+    environment:
+      - LOG_LEVEL=debug
+      - TZ=Etc/UTC
+      - PORT=5055
+    dns:
+      - 1.1.1.1
+      - 8.8.8.8
+    # ports:
+    #   - 5055:5055
+    networks:
+      - proxy
+    volumes:
+      - /mnt/ssd/arr/seerr/config:/app/config
+    healthcheck:
+      test: wget --no-verbose --tries=1 --spider http://localhost:5055/api/v1/status || exit 1
+      start_period: 20s
+      timeout: 3s
+      interval: 15s
+      retries: 3
+    restart: unless-stopped
+
+  plex:
+    image: lscr.io/linuxserver/plex:latest
+    container_name: plex
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+      # Optional: set to "docker" for clearer networking in some setups
+      - VERSION=docker
+      # Optional: if you want to claim the server automatically, add your claim token:
+      - PLEX_CLAIM=claim-b84Qd4tUo891Bs6yBGRc
+    volumes:
+      - /mnt/ssd/arr/plex/config:/config
+      # Plex transcode scratch (optional but recommended on SSD)
+      - /mnt/ssd/arr/plex/transcode:/transcode
+      # Keep the same mounts you already use so paths match Radarr/Sonarr/Bazarr
+      - /mnt/ssd/arr/sonarr/tvseries:/data/tvshows
+      - /mnt/ssd/arr/radarr/movies:/data/movies
+      - /mnt/ssd/arr/readarr/books:/data/books
+      - /mnt/ssd/arr/lidarr/music:/data/music
+    ports:
+      # - 32400:32400     # Plex Web
+      # Optional (recommended) discovery/casting on LAN:
+      - 1900:1900/udp
+      - 5353:5353/udp
+      - 32410:32410/udp
+      - 32412:32412/udp
+      - 32413:32413/udp
+      - 32414:32414/udp
+      - 32469:32469 # DLNA (only if you use it)
     deploy:
       resources:
         reservations:
@@ -145,3 +224,7 @@ services:
               capabilities: ["gpu"]
               device_ids: ["0"]
     restart: unless-stopped
+
+networks:
+  proxy:
+    external: true
