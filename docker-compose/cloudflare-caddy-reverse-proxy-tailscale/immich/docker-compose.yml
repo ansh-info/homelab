@@ -22,8 +22,10 @@ services:
       - /etc/localtime:/etc/localtime:ro
     env_file:
       - stack.env
-    ports:
-      - "127.0.0.1:12283:2283"
+    # ports:
+    #   - "127.0.0.1:2283:2283"
+    networks:
+      - proxy
     depends_on:
       - redis
       - database
@@ -45,6 +47,8 @@ services:
     env_file:
       - stack.env
     restart: always
+    networks:
+      - proxy
     healthcheck:
       disable: false
 
@@ -53,6 +57,8 @@ services:
     image: docker.io/valkey/valkey:8-bookworm@sha256:fea8b3e67b15729d4bb70589eb03367bab9ad1ee89c876f54327fc7c6e618571
     healthcheck:
       test: redis-cli ping || exit 1
+    networks:
+      - proxy
     restart: always
 
   database:
@@ -69,6 +75,11 @@ services:
       # Do not edit the next line. If you want to change the database storage location on your system, edit the value of DB_DATA_LOCATION in the .env file
       - ${DB_DATA_LOCATION}:/var/lib/postgresql/data
     shm_size: 128mb
+    networks:
+      - proxy
     restart: always
 # volumes:
 #   model-cache:
+networks:
+  proxy:
+    external: true
