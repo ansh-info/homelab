@@ -32,6 +32,7 @@ services:
       # If using Docker's default `bridge` network setting the dns listening mode should be set to 'all'
       FTLCONF_dns_listeningMode: "all"
       PIHOLE_HOSTNAME: pihole
+      FTLCONF_misc_etc_dnsmasq_d: "true"
     # Volumes store your data between container upgrades
     volumes:
       # For persisting Pi-hole's databases and common configuration file
