@@ -1,15 +1,15 @@
 services:
   watchtower:
     container_name: watchtower
-    image: containrrr/watchtower
+    image: containrrr/watchtower:latest
     restart: unless-stopped
     environment:
       - TZ=Asia/Kolkata
+      - DOCKER_API_VERSION=1.40
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     command:
       - --interval
-      - "86400" # 24 hours in seconds
+      - "86400"
       - --cleanup
-      - --label-enable
       - --debug
