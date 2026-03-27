@@ -1,76 +1,97 @@
 # homelab
 
-This repository is the central source of truth for my personal **homelab** setup. It's a continuously evolving, self-hosted infrastructure built for development, experimentation, and automation. While it's currently focused on supporting my **art and media stack**, it is growing into a more complete platform that will power other projects—such as my **Geckos GitHub**, creative tools, and self-hosted developer workflows.
+This repository is the source of truth for rebuilding and operating my personal homelab. It documents the host layout, Portainer-managed Docker stacks, private networking model, storage paths, and service-to-service dependencies that make the environment work.
 
-## What This Repo Is
+The system is private-first. Services are not published individually to the internet. They are reached through Tailscale, resolved by Pi-hole, and routed by Nginx Proxy Manager over a shared Docker network.
 
-A modular, containerized system that defines everything I run on my local network or via Tailscale. It includes configurations, infrastructure-as-code, dotfiles, and setup scripts to deploy, maintain, and monitor a secure and efficient homelab.
+## Architecture Summary
 
----
+The core request flow is:
 
-## Current Focus Areas
+1. A client joins the tailnet through Tailscale.
+2. Pi-hole resolves `*.homelab.ansh-info.com` to the homelab Tailscale IP.
+3. The client connects to the homelab host on `80` or `443`.
+4. Nginx Proxy Manager reads the hostname and forwards traffic to the correct container on the shared `proxy` network.
+5. The target service responds from its internal container port.
 
-- **Creative stack**: High-performance media management and self-hosted cloud tools tailored for creative workflows
-- **Private-first**: No public ports—everything is routed via **Tailscale** or the local LAN
-- **GPU acceleration**: Enabled for heavy workloads like media transcoding
-- **Art & dev fusion**: Bridging my art stack with local dev services and upcoming tools for my other projects
+```mermaid
+flowchart LR
+    Client[Tailscale Client] --> DNS[Pi-hole DNS]
+    DNS -->|*.homelab.ansh-info.com -> Tailscale IP| Host[homelab host]
+    Host --> NPM[Nginx Proxy Manager]
+    NPM --> ProxyNet[Docker proxy network]
+    ProxyNet --> Apps[App containers]
+```
 
----
+Core platform components:
 
-## Repository Structure
+- `Tailscale` for private network access
+- `Pi-hole` for internal DNS and wildcard local records
+- `Nginx Proxy Manager` for hostname-based routing and TLS
+- `Docker` plus `Portainer` for stack deployment and operations
+- Shared external Docker network `proxy` for reverse-proxied services
 
-| Folder          | Description                                                                   |
-| --------------- | ----------------------------------------------------------------------------- |
-| `media-server/` | Jellyfin, Radarr, Sonarr, Prowlarr, qBittorrent, Bazarr — all GPU-accelerated |
-| `nextcloud/`    | Full Nextcloud stack with MariaDB, Redis, and TLS reverse proxy               |
-| `networking/`   | Caddy config, Tailscale DNS, local overrides                                  |
-| `monitoring/`   | Grafana + Prometheus stack (in progress)                                      |
-| `infra/`        | System scripts, automation, and service unit files                            |
+## Current Stack Layout
 
----
+The main service definitions live under [docker-compose](docker-compose):
 
-## Goals
+- [docker-compose/pihole/docker-compose.yml](docker-compose/pihole/docker-compose.yml)
+- [docker-compose/nginx-proxy-manager/docker-compose.yml](docker-compose/nginx-proxy-manager/docker-compose.yml)
+- [docker-compose/jellyfin-arr-stack/docker-compose.yml](docker-compose/jellyfin-arr-stack/docker-compose.yml)
+- [docker-compose/immich/docker-compose.yml](docker-compose/immich/docker-compose.yml)
+- [docker-compose/nextcloud-aio/docker-compose.yml](docker-compose/nextcloud-aio/docker-compose.yml)
+- [docker-compose/watchtower/docker-compose.yml](docker-compose/watchtower/docker-compose.yml)
 
-- **Self-hosted everything**: From media to calendars to developer dashboards
-- **Modular design**: Easy to reproduce, rebuild, or migrate
-- **Secure by design**: Tailscale as a zero-trust access layer
-- **GPU support**: Offload media tasks with NVIDIA acceleration
-- **Observable**: Integrated monitoring with Prometheus and Grafana (coming soon)
+Additional repo content includes dotfiles, editor config, and utility scripts, but the homelab deployment path is centered on the compose files above.
 
----
+## Rebuild Order
 
-## Requirements
+Use this order when rebuilding the machine from scratch:
 
-- Docker & Docker Compose
-- Tailscale (installed & authenticated)
-- NVIDIA GPU with correct drivers
-- Ubuntu Server or any recent Linux distro
+1. Prepare the Linux host, storage mounts, and baseline packages.
+2. Install Docker and Portainer.
+3. Install Tailscale and join the machine to the tailnet.
+4. Apply firewall rules for the private ingress model.
+5. Create the shared external Docker network `proxy`.
+6. Prepare stack directories, persistent volumes, and environment files.
+7. Deploy Pi-hole.
+8. Deploy Nginx Proxy Manager.
+9. Restore or recreate internal DNS and proxy host configuration.
+10. Deploy application stacks such as Jellyfin/Arr, Immich, Nextcloud AIO, and Watchtower.
+11. Run end-to-end verification for DNS, proxy routing, and service health.
 
----
+## Documentation Map
 
-## Coming Soon
+Start here for the detailed rebuild docs:
 
-- Live metrics via Grafana dashboards
-- Local LLM tools for creative + coding workflows
-- Automated backups and sync to cloud or external storage
+- [docs/README.md](docs/README.md)
+- [docs/SETUP.md](docs/SETUP.md)
+- [docs/NETWORKING.md](docs/NETWORKING.md)
+- [docs/OPERATIONS.md](docs/OPERATIONS.md)
+- [docs/VARIABLES.md](docs/VARIABLES.md)
+- [docs/stacks/portainer.md](docs/stacks/portainer.md)
+- [docs/stacks/pihole.md](docs/stacks/pihole.md)
+- [docs/stacks/nginx-proxy-manager.md](docs/stacks/nginx-proxy-manager.md)
+- [docs/stacks/jellyfin-arr-stack.md](docs/stacks/jellyfin-arr-stack.md)
+- [docs/stacks/immich.md](docs/stacks/immich.md)
+- [docs/stacks/nextcloud-aio.md](docs/stacks/nextcloud-aio.md)
+- [docs/stacks/watchtower.md](docs/stacks/watchtower.md)
 
----
+## Repository Layout
+
+- [docker-compose](docker-compose): Portainer stack definitions and service-specific compose files
+- [utils](utils): helper scripts
+- [docs](docs): rebuild and operations documentation
+
+## Operating Model
+
+- Primary deployment workflow: `Portainer stacks`
+- Secondary fallback workflow: `docker compose` and direct `docker` CLI commands for inspection and recovery
+- Internal DNS pattern: wildcard records under `*.homelab.ansh-info.com`
+- Access pattern: Tailscale only, with `53`, `80`, and `443` allowed on `tailscale0`
 
 ## Status
 
-- ✅ Core stack is deployed and stable (media server, Nextcloud, Caddy)
-- 🔒 Tailscale DNS + TLS working as expected
-- 📈 Monitoring & observability under active development
-- 🔧 Future integrations and services are planned as part of the broader platform
-
----
-
-## Philosophy
-
-This isn't just a homelab—it's a **living lab** where I build systems for myself first. Whether for creativity, development, or learning, everything here is designed to be private, performant, and personally empowering.
-
----
-
-## License
-
-MIT License
+- Core private ingress path is working through Tailscale, Pi-hole, and NPM.
+- Major services are defined as separate compose stacks for easier redeploy and troubleshooting.
+- Documentation is being rewritten to make rebuilds deterministic and repeatable.
