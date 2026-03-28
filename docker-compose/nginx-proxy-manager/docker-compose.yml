@@ -28,8 +28,8 @@ services:
       # DISABLE_IPV6: 'true'
 
     volumes:
-      - /mnt/ssd/npm/data:/data
-      - /mnt/ssd/npm/letsencrypt:/etc/letsencrypt
+      - /mnt/ssd/docker-volumes/nginx-proxy-manager/data:/data
+      - /mnt/ssd/docker-volumes/nginx-proxy-manager/letsencrypt:/etc/letsencrypt
 
 networks:
   proxy:
