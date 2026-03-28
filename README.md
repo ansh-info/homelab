@@ -67,6 +67,7 @@ Start here for the detailed rebuild docs:
 - [docs/README.md](docs/README.md)
 - [docs/SETUP.md](docs/SETUP.md)
 - [docs/NETWORKING.md](docs/NETWORKING.md)
+- [docs/CLOUDFLARE.md](docs/CLOUDFLARE.md)
 - [docs/OPERATIONS.md](docs/OPERATIONS.md)
 - [docs/VARIABLES.md](docs/VARIABLES.md)
 - [docs/stacks/portainer.md](docs/stacks/portainer.md)
