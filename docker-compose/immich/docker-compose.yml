@@ -43,7 +43,7 @@ services:
     #   service: cpu # set to one of [armnn, cuda, rocm, openvino, openvino-wsl, rknn] for accelerated inference - use the `-wsl` version for WSL2 where applicable
     volumes:
       # - model-cache:/cache
-      - /mnt/ssd/immich/model-cache:/cache # <— persist models on SSD
+      - /mnt/ssd/docker-volumes/immich/model-cache:/cache # <— persist models on SSD
     env_file:
       - stack.env
     restart: always
