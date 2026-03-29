@@ -28,6 +28,7 @@ Use the docs in this order for a full rebuild:
 - [stacks/jellyfin-arr-stack.md](stacks/jellyfin-arr-stack.md)
 - [stacks/immich.md](stacks/immich.md)
 - [stacks/nextcloud-aio.md](stacks/nextcloud-aio.md)
+- [stacks/openclaw.md](stacks/openclaw.md)
 - [stacks/watchtower.md](stacks/watchtower.md)
 
 ## Documentation Conventions

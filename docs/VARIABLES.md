@@ -59,6 +59,17 @@ The placeholders are documentation variables only. They are not automatically ex
 | --- | --- | --- |
 | `${WATCHTOWER_INTERVAL_SECONDS}` | Watchtower polling interval | `86400` |
 
+## OpenClaw Variables
+
+| Variable | Meaning | Current Example |
+| --- | --- | --- |
+| `${OPENCLAW_DATA_ROOT}` | Base path for OpenClaw persistent data | `/mnt/ssd/docker-volumes/openclaw` |
+| `${OPENCLAW_CONFIG_ROOT}` | Host path for OpenClaw config and state | `/mnt/ssd/docker-volumes/openclaw/config` |
+| `${OPENCLAW_WORKSPACE_ROOT}` | Host path for OpenClaw workspace data | `/mnt/ssd/docker-volumes/openclaw/workspace` |
+| `${OPENCLAW_TZ}` | Timezone used by the OpenClaw container | `Asia/Kolkata` |
+| `${OPENCLAW_HOSTNAME}` | Private hostname for the OpenClaw gateway | `openclaw.homelab.ansh-info.com` |
+| `${OPENCLAW_GATEWAY_PORT}` | Internal Gateway port served by OpenClaw | `18789` |
+
 ## Notes
 
 - When multiple docs mention the same variable, prefer using the definitions in this file rather than inventing a new variant.

@@ -40,6 +40,7 @@ The main service definitions live under [docker-compose](docker-compose):
 - [docker-compose/jellyfin-arr-stack/docker-compose.yml](docker-compose/jellyfin-arr-stack/docker-compose.yml)
 - [docker-compose/immich/docker-compose.yml](docker-compose/immich/docker-compose.yml)
 - [docker-compose/nextcloud-aio/docker-compose.yml](docker-compose/nextcloud-aio/docker-compose.yml)
+- [docker-compose/openclaw/docker-compose.yml](docker-compose/openclaw/docker-compose.yml)
 - [docker-compose/watchtower/docker-compose.yml](docker-compose/watchtower/docker-compose.yml)
 
 Additional repo content includes dotfiles, editor config, and utility scripts, but the homelab deployment path is centered on the compose files above.
@@ -57,7 +58,7 @@ Use this order when rebuilding the machine from scratch:
 7. Deploy Pi-hole.
 8. Deploy Nginx Proxy Manager.
 9. Restore or recreate internal DNS and proxy host configuration.
-10. Deploy application stacks such as Jellyfin/Arr, Immich, Nextcloud AIO, and Watchtower.
+10. Deploy application stacks such as Jellyfin/Arr, Immich, Nextcloud AIO, OpenClaw, and Watchtower.
 11. Run end-to-end verification for DNS, proxy routing, and service health.
 
 ## Documentation Map
@@ -76,6 +77,7 @@ Start here for the detailed rebuild docs:
 - [docs/stacks/jellyfin-arr-stack.md](docs/stacks/jellyfin-arr-stack.md)
 - [docs/stacks/immich.md](docs/stacks/immich.md)
 - [docs/stacks/nextcloud-aio.md](docs/stacks/nextcloud-aio.md)
+- [docs/stacks/openclaw.md](docs/stacks/openclaw.md)
 - [docs/stacks/watchtower.md](docs/stacks/watchtower.md)
 
 ## Repository Layout
