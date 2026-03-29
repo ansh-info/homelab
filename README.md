@@ -4,15 +4,15 @@
 [![Validate AeroSpace Config](https://github.com/ansh-info/homelab/actions/workflows/validate-aerospace-config.yml/badge.svg)](https://github.com/ansh-info/homelab/actions/workflows/validate-aerospace-config.yml)
 [![Release](https://github.com/ansh-info/homelab/actions/workflows/release.yml/badge.svg)](https://github.com/ansh-info/homelab/actions/workflows/release.yml)
 
-![OpenClaw](https://img.shields.io/badge/OpenClaw-Deployed-2f855a?style=flat-square)
+![🦞 OpenClaw](https://img.shields.io/badge/%F0%9F%A6%9E%20OpenClaw-Deployed-2f855a?style=flat-square)
 ![Portainer](https://img.shields.io/badge/Portainer-Deployed-13BEF9?style=flat-square&logo=portainer&logoColor=white)
 ![Nginx Proxy Manager](https://img.shields.io/badge/Nginx%20Proxy%20Manager-Deployed-F15833?style=flat-square&logo=nginxproxymanager&logoColor=white)
 ![Pi-hole](https://img.shields.io/badge/Pi--hole-Deployed-96060C?style=flat-square&logo=pi-hole&logoColor=white)
 ![Tailscale](https://img.shields.io/badge/Tailscale-Private%20Access-1A73E8?style=flat-square&logo=tailscale&logoColor=white)
-![Immich](https://img.shields.io/badge/Immich-Deployed-4250AF?style=flat-square)
+![📷 Immich](https://img.shields.io/badge/%F0%9F%93%B7%20Immich-Deployed-4250AF?style=flat-square)
 ![Nextcloud](https://img.shields.io/badge/Nextcloud-Deployed-0082C9?style=flat-square&logo=nextcloud&logoColor=white)
 ![Jellyfin](https://img.shields.io/badge/Jellyfin-Deployed-5A2D81?style=flat-square&logo=jellyfin&logoColor=white)
-![Watchtower](https://img.shields.io/badge/Watchtower-Deployed-4169E1?style=flat-square)
+![🗼 Watchtower](https://img.shields.io/badge/%F0%9F%97%BC%20Watchtower-Deployed-4169E1?style=flat-square)
 ![Docker](https://img.shields.io/badge/Docker-Compose%20Stacks-2496ED?style=flat-square&logo=docker&logoColor=white)
 
 This repository is the source of truth for rebuilding and operating my personal homelab. It documents the host layout, Portainer-managed Docker stacks, private networking model, storage paths, and service-to-service dependencies that make the environment work.
