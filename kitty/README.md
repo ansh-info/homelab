@@ -1,86 +1,192 @@
-# Kitty Terminal Configuration
+# Kitty Setup
 
-This repository contains a customized configuration for the [Kitty](https://sw.kovidgoyal.net/kitty/) terminal emulator, designed to provide a clean, efficient, and visually appealing experience. It includes a tailored layout, keyboard shortcuts, visual settings, and the **Tokyo Night** color scheme.
+This directory contains the Kitty terminal configuration used in this repo.
 
-## Features
+Current files:
 
-- **JetBrains Mono Nerd Font** for rich glyph support
-- **Tokyo Night theme** with carefully selected colors for readability
-- Custom **window dimensions**, **line height**, and **font size**
-- Optimized **cursor behavior**, **mouse interaction**, and **tab/window navigation**
-- Fast **performance tweaks** with minimal input and repaint delay
-- Keyboard mappings for efficient **tab**, **window**, **split**, and **layout** management
-- Support for image previews and clipboard integration
-- Compatible with **macOS and Linux**
+- [kitty.conf](kitty.conf): main Kitty configuration
+- [current-theme.conf](current-theme.conf): active color theme included by `kitty.conf`
 
-## Installation
+The source of truth is the config in this directory. This README explains what the current setup does and how to install it.
 
-### 1. Install Kitty
+## Current Setup
 
-#### macOS (Homebrew)
+The current Kitty config is built around:
 
-```sh
+- `JetBrains Mono Nerd Font`
+- a `14.0` font size
+- `Tokyo Night` as the active theme
+- `zsh` as the shell
+- `nvim` as the configured editor
+- macOS-specific behavior for `Option` as `Alt`
+
+## Main Config Behavior
+
+Current highlights from [kitty.conf](kitty.conf):
+
+- font family:
+  - `JetBrains Mono Nerd Font`
+- font size:
+  - `14.0`
+- line height:
+  - `120%`
+- cursor:
+  - block cursor
+  - blinking enabled
+  - cursor trail enabled
+- initial window size:
+  - width `1000`
+  - height `650`
+- window padding:
+  - `4`
+- decorations:
+  - `titlebar-only`
+- tab bar:
+  - top edge
+  - powerline style
+  - slanted powerline tabs
+- shell:
+  - `/bin/zsh`
+- editor:
+  - `/usr/local/bin/nvim`
+- terminal type:
+  - `xterm-256color`
+- layouts:
+  - `splits,stack`
+- Kitty remote control:
+  - enabled
+- Kitty listen socket:
+  - `unix:/tmp/kitty`
+
+## Theme
+
+The active theme is loaded through:
+
+```conf
+include current-theme.conf
+```
+
+Current theme file:
+
+- [current-theme.conf](current-theme.conf)
+
+Current theme:
+
+- `Tokyo Night`
+
+Theme metadata from the file:
+
+- name: `Tokyo Night`
+- author: `Folke Lemaitre`
+- upstream:
+  - `https://github.com/folke/tokyonight.nvim/raw/main/extras/kitty/tokyonight_night.conf`
+
+## Mouse and Clipboard Behavior
+
+Current relevant behavior:
+
+- `copy_on_select yes`
+- `cmd+c` copies to clipboard
+- `cmd+v` pastes from clipboard
+- URL detection is enabled
+- `kitty_mod` is used for `open_url_modifiers`
+
+## Performance Settings
+
+Current performance-related values:
+
+- `repaint_delay 8`
+- `input_delay 0`
+- `sync_to_monitor yes`
+
+## Bell Behavior
+
+Current bell behavior:
+
+- audio bell disabled
+- visual bell duration `0.0`
+- window alert on bell enabled
+- bell on tab disabled
+
+## macOS-Specific Settings
+
+This config is clearly optimized for macOS.
+
+Current macOS settings include:
+
+- `macos_option_as_alt yes`
+- `macos_quit_when_last_window_closed yes`
+- `macos_window_resizable yes`
+- `macos_thicken_font 0.75`
+- `macos_traditional_fullscreen no`
+- `macos_show_window_title_in all`
+
+## Install on macOS
+
+Install Kitty:
+
+```bash
 brew install --cask kitty
 ```
 
-#### Linux
+Install the required font:
 
-Follow the official instructions from the [Kitty website](https://sw.kovidgoyal.net/kitty/#installation) or use your package manager:
-
-**Debian/Ubuntu:**
-
-```sh
-sudo apt install kitty
-```
-
-**Arch Linux:**
-
-```sh
-sudo pacman -S kitty
-```
-
-### 2. Install JetBrains Mono Nerd Font
-
-Download and install from the [Nerd Fonts website](https://www.nerdfonts.com/font-downloads), or via Homebrew:
-
-```sh
+```bash
 brew tap homebrew/cask-fonts
 brew install --cask font-jetbrains-mono-nerd-font
 ```
 
-### 3. Apply the Configuration
+## Install This Config
 
-1. Clone this repository:
+Copy or symlink the repo config into Kitty's config directory:
 
-```sh
-git clone https://github.com/yourusername/kitty-config.git
-```
-
-2. Copy or symlink the config file:
-
-```sh
+```bash
 mkdir -p ~/.config/kitty
-cp kitty.conf ~/.config/kitty/kitty.conf
+cp kitty/kitty.conf ~/.config/kitty/kitty.conf
+cp kitty/current-theme.conf ~/.config/kitty/current-theme.conf
 ```
 
-Or symlink it to keep it updated:
+Or symlink them:
 
-```sh
-ln -s ~/path/to/kitty-config/kitty.conf ~/.config/kitty/kitty.conf
+```bash
+mkdir -p ~/.config/kitty
+ln -sf ~/path/to/repo/kitty/kitty.conf ~/.config/kitty/kitty.conf
+ln -sf ~/path/to/repo/kitty/current-theme.conf ~/.config/kitty/current-theme.conf
 ```
 
-### 4. Launch Kitty
-
-```sh
-kitty
-```
+Then reload Kitty config or restart Kitty.
 
 ## Notes
 
-- The configuration assumes you are using `zsh` and `nvim`. You can change the `shell` and `editor` values to fit your preferences.
-- macOS users benefit from system-specific tweaks like `macos_quit_when_last_window_closed` and `macos_thicken_font`.
-- This config disables shell integration for cursor shaping and echo control to avoid conflicts.
+Current assumptions in this config:
 
-## License
+- `zsh` exists at `/bin/zsh`
+- `nvim` exists at `/usr/local/bin/nvim`
+- `JetBrains Mono Nerd Font` is installed
 
-MIT
+If any of those paths differ on the local machine, update [kitty.conf](kitty.conf).
+
+## Maintenance Notes
+
+If you change:
+
+- font family
+- font size
+- shell path
+- editor path
+- tab bar behavior
+- macOS-specific settings
+- active theme include
+
+update:
+
+- [kitty.conf](kitty.conf)
+- [current-theme.conf](current-theme.conf) if the theme itself changes
+- [README.md](README.md)
+
+Keep the README aligned with the actual config, not a generic Kitty setup.
+
+## References
+
+- Kitty docs: https://sw.kovidgoyal.net/kitty/
+- Kitty config docs: https://sw.kovidgoyal.net/kitty/conf/

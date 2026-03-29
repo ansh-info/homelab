@@ -1,102 +1,229 @@
-# Tmux Configuration
+# Tmux Setup
 
-This repository contains a custom `tmux` configuration optimized for enhanced navigation, session management, and aesthetics.
+This directory contains the tmux configuration used in this repo.
 
-## Features
+Current files:
 
-- Prefix remapped to `Ctrl-a`
-- System clipboard integration
-- Mouse support enabled
-- Vi-style keybindings in copy mode
-- Smart pane splitting and Vim-style pane navigation
-- Persistent sessions using `tmux-resurrect` and `tmux-continuum`
-- Stylish Catppuccin theme with CPU, battery, uptime, and session info in the status bar
-- Plugin support via TPM (Tmux Plugin Manager)
+- [.tmux.conf](.tmux.conf): main tmux configuration
 
-## Installation
+This README explains the current behavior, plugin assumptions, installation steps, and maintenance notes for the actual config in this directory.
 
-### 1. Install Tmux
+## Current Setup
 
-Ensure Tmux is installed:
+The current tmux config is built around:
+
+- `Ctrl-a` as the tmux prefix
+- `zsh` as the default shell
+- vi-style navigation and copy mode
+- mouse support
+- top status bar
+- Catppuccin theme integration
+- persistent sessions using `tmux-resurrect` and `tmux-continuum`
+- clipboard integration using `pbcopy`
+
+## Main Config Behavior
+
+Current highlights from [.tmux.conf](.tmux.conf):
+
+- prefix:
+  - `Ctrl-a`
+- default terminal:
+  - `tmux-256color`
+- terminal override:
+  - `xterm-256color:RGB`
+- mouse:
+  - enabled
+- window numbering:
+  - starts at `1`
+- pane numbering:
+  - starts at `1`
+- history limit:
+  - `10000`
+- clipboard:
+  - enabled
+- status bar position:
+  - top
+
+## Keybindings
+
+Current important bindings:
+
+| Action | Binding |
+| --- | --- |
+| Reload config | `Prefix + r` |
+| Focus pane left | `Prefix + h` |
+| Focus pane down | `Prefix + j` |
+| Focus pane up | `Prefix + k` |
+| Focus pane right | `Prefix + l` |
+| Resize pane left | `Prefix + H` |
+| Resize pane down | `Prefix + J` |
+| Resize pane up | `Prefix + K` |
+| Resize pane right | `Prefix + L` |
+| Split horizontally | `Prefix + |` |
+| Split vertically | `Prefix + -` |
+| New window in current path | `Prefix + c` |
+| Previous window | `Prefix + Ctrl-h` |
+| Next window | `Prefix + Ctrl-l` |
+| Paste buffer | `Prefix + P` |
+
+## Copy Mode
+
+Current copy-mode behavior uses vi keys.
+
+Bindings:
+
+| Action | Binding |
+| --- | --- |
+| Begin selection | `v` |
+| Copy selection to macOS clipboard | `y` |
+| Toggle rectangle selection | `r` |
+| Mouse drag copy to clipboard | mouse drag end |
+
+Clipboard copy uses:
+
+- `pbcopy`
+
+This config is therefore clearly macOS-oriented.
+
+## Pane and Window Behavior
+
+Current behavior:
+
+- pane splitting preserves the current pane path
+- new windows open in the current pane path
+- windows are renumbered automatically when one is closed
+- activity monitoring is enabled
+- visual activity notification is disabled
+
+## Plugins
+
+Current plugin list from the config:
+
+- `tmux-plugins/tpm`
+- `tmux-plugins/tmux-sensible`
+- `catppuccin/tmux#v2.1.0`
+- `christoomey/vim-tmux-navigator`
+- `tmux-plugins/tmux-resurrect`
+- `tmux-plugins/tmux-continuum`
+- `tmux-plugins/tmux-yank`
+- `fcsonline/tmux-thumbs`
+
+Current plugin-related settings:
+
+- `@continuum-restore = on`
+- `@resurrect-capture-pane-contents = on`
+- `@thumbs-key = F`
+- `@catppuccin_flavor = "mocha"`
+- `@catppuccin_window_status_style = "rounded"`
+
+## Status Bar
+
+Current status bar behavior:
+
+- shown at the top
+- left side is empty
+- right side includes Catppuccin segments for:
+  - application
+  - CPU
+  - session
+  - uptime
+  - battery
+
+Current relevant settings:
+
+- `status-right-length = 100`
+- `status-left-length = 100`
+
+## Shell and Command Behavior
+
+Current shell settings:
+
+- `default-shell /bin/zsh`
+- `default-command "exec /bin/zsh"`
+- `default-command zsh`
+
+This config assumes:
+
+- `zsh` exists
+- `pbcopy` exists
+- plugin files are available in the expected plugin directories
+
+## Plugin Path Assumptions
+
+The config currently loads plugins from two different locations:
+
+- `~/.config/tmux/plugins/...`
+- `~/.tmux/plugins/tpm/tpm`
+
+Specifically:
+
+```tmux
+run ~/.config/tmux/plugins/catppuccin/tmux/catppuccin.tmux
+run ~/.config/tmux/plugins/tmux-plugins/tmux-cpu/cpu.tmux
+run ~/.config/tmux/plugins/tmux-plugins/tmux-battery/battery.tmux
+run '~/.tmux/plugins/tpm/tpm'
+```
+
+That means the current setup assumes:
+
+- TPM itself is installed under `~/.tmux/plugins/tpm`
+- some plugins are available under `~/.config/tmux/plugins/...`
+
+If you want a cleaner setup later, this is one of the first things worth normalizing.
+
+## Install on macOS
+
+Install tmux:
 
 ```bash
 brew install tmux
 ```
 
-### 2. Install TPM (Tmux Plugin Manager)
-
-Clone TPM into your plugins directory:
+Install TPM:
 
 ```bash
 git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
 ```
 
-### 3. Install Required Plugins
+Then install plugins from inside tmux with:
 
-Once inside a Tmux session, press:
-
-```
-Prefix (Ctrl-a) + I
+```text
+Prefix + I
 ```
 
-This will install all plugins defined in the config file.
+## Install This Config
 
-### 4. Copy the Configuration File
-
-Place the `tmux.conf` file into your home directory:
+Copy the config into place:
 
 ```bash
-cp tmux.conf ~/.tmux.conf
+cp tmux/.tmux.conf ~/.tmux.conf
 ```
 
-Or use the config from `~/.config/tmux/tmux.conf` if you manage dotfiles via XDG.
+Then reload inside tmux:
 
-### 5. Reload Configuration
-
-Within a Tmux session, reload the config with:
-
-```
-Prefix (Ctrl-a) + r
+```text
+Prefix + r
 ```
 
-## Plugin List
+## Maintenance Notes
 
-- [`tmux-plugins/tpm`](https://github.com/tmux-plugins/tpm) – Plugin manager
-- [`tmux-plugins/tmux-sensible`](https://github.com/tmux-plugins/tmux-sensible) – Sensible defaults
-- [`catppuccin/tmux`](https://github.com/catppuccin/tmux) – Theming
-- [`christoomey/vim-tmux-navigator`](https://github.com/christoomey/vim-tmux-navigator) – Seamless navigation between Vim and Tmux
-- [`tmux-plugins/tmux-resurrect`](https://github.com/tmux-plugins/tmux-resurrect) – Restore sessions
-- [`tmux-plugins/tmux-continuum`](https://github.com/tmux-plugins/tmux-continuum) – Auto-save sessions
-- [`tmux-plugins/tmux-yank`](https://github.com/tmux-plugins/tmux-yank) – Clipboard integration
-- [`fcsonline/tmux-thumbs`](https://github.com/fcsonline/tmux-thumbs) – Fast link and text selection
+If you change:
 
-## Default Keybindings
+- prefix
+- shell settings
+- plugin list
+- plugin path assumptions
+- copy-mode behavior
+- status bar layout
 
-| Action                  | Binding                  |     |
-| ----------------------- | ------------------------ | --- |
-| Reload config           | `Ctrl-a r`               |     |
-| Select pane (hjkl)      | `Ctrl-a h/j/k/l`         |     |
-| Resize pane (HJKL)      | `Ctrl-a Shift + h/j/k/l` |     |
-| Split pane horizontally | \`Ctrl-a                 | \`  |
-| Split pane vertically   | `Ctrl-a -`               |     |
-| Create new window       | `Ctrl-a c`               |     |
-| Next/prev window        | `Ctrl-a C-l / C-h`       |     |
-| Copy mode (Vi)          | `Ctrl-a [`               |     |
-| Copy selection          | `v` + `y`                |     |
-| Paste buffer            | `Ctrl-a P`               |     |
+update both:
 
-## Notes
+- [.tmux.conf](.tmux.conf)
+- [README.md](README.md)
 
-- This configuration assumes `zsh` is your default shell.
-- Make sure `pbcopy` is available on macOS for clipboard support in copy mode.
-- Plugins like `tmux-cpu` and `tmux-battery` are loaded directly. Ensure they are cloned into `~/.config/tmux/plugins/`.
+Keep the README aligned with the actual config rather than documenting a generic tmux setup.
 
-## Recommended Dependencies
+## References
 
-- [kitty](https://github.com/kovidgoyal/kitty)
-- [Nerd Fonts](https://www.nerdfonts.com/) (for icons and enhanced status line appearance)
-- [fzf](https://github.com/junegunn/fzf) and [ripgrep](https://github.com/BurntSushi/ripgrep) for fuzzy search integrations (optional)
-
-## License
-
-MIT License
+- tmux docs: https://github.com/tmux/tmux/wiki
+- TPM: https://github.com/tmux-plugins/tpm

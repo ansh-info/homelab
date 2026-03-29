@@ -1,86 +1,173 @@
-# AeroSpace Configuration
+# AeroSpace Setup
 
-This repository contains a personalized configuration for [AeroSpace](https://github.com/nikitabobko/AeroSpace), a dynamic tiling window manager for macOS.
+This directory contains the AeroSpace configuration used on macOS.
 
-## ✨ Features
+The source of truth is:
 
-- Starts automatically on login
-- Smart window layouts: `tiles` and `accordion`
-- Workspace keybindings (Alt + number)
-- Intuitive resizing and navigation
-- Gap customizations between windows and screen edges
-- Layout normalization for nested containers
-- Modes for resizing and service commands
-- Predefined movement, focus, and layout switching shortcuts
+- [aerospace.toml](aerospace.toml)
 
-## Keybindings Overview
+This README explains what the current config does, how to install it, and how the keybindings are organized.
 
-| Action                    | Shortcut                |
-| ------------------------- | ----------------------- |
-| Focus window (hjkl)       | `Alt + h/j/k/l`         |
-| Move window (hjkl)        | `Alt + Shift + h/j/k/l` |
-| Workspace switch          | `Alt + 1-7`             |
-| Move window to workspace  | `Alt + Shift + 1-8`     |
-| Fullscreen toggle         | `Alt + Shift + f`       |
-| Toggle layout (tiles)     | `Alt + /`               |
-| Toggle layout (accordion) | `Alt + ,`               |
-| Resize mode               | `Alt + Shift + r`       |
-| Service mode              | `Alt + Shift + ;`       |
+## Current Behavior
 
----
+The current config is built around three modes:
 
-## Installation on macOS
+- `main`: normal navigation, movement, layout switching, and workspace control
+- `resize`: temporary mode for resizing containers
+- `service`: temporary mode for reload, flatten, floating-layout toggle, and join actions
 
-### 1. Install [AeroSpace](https://github.com/nikitabobko/AeroSpace)
+Other current behavior:
 
-AeroSpace is available via Homebrew:
+- AeroSpace starts at login
+- root layout defaults to `tiles`
+- root orientation defaults to `auto`
+- normalization is enabled
+- uniform `5px` gaps are used around and between windows
+- accordion layout uses `30px` padding
+- workspace switching is enabled for `1` through `7`
+- moving windows to workspaces is enabled for `1` through `8`
+
+## Install on macOS
+
+Install AeroSpace with Homebrew:
 
 ```bash
 brew tap nikitabobko/homebrew-aerospace
 brew install --cask aerospace
 ```
 
-### 2. Enable Accessibility Permissions
+Then grant the required macOS permissions:
 
-After installation, macOS will prompt you to give AeroSpace Accessibility permissions. You can also enable it manually:
+1. Open `System Settings`
+2. Go to `Privacy & Security`
+3. Open `Accessibility`
+4. Allow `AeroSpace.app`
 
-- Open **System Settings** → **Privacy & Security** → **Accessibility**
-- Add and enable **AeroSpace.app**
+## Install This Config
 
-### 3. Add the Config File
-
-Place your custom configuration in your home directory:
+Copy the repo config into the default AeroSpace config location:
 
 ```bash
-cp aerospace.toml ~/.aerospace.toml
+cp aerospace/aerospace.toml ~/.aerospace.toml
 ```
 
-> If `~/.aerospace.toml` is missing a key, the default config will be used as a fallback.
+Then either:
 
-### 4. Start at Login
+- restart AeroSpace
+- or reload the config from service mode
 
-Make sure `start-at-login = true` is set in the config to launch AeroSpace when you log in.
+## Keybindings
 
----
+## Main Mode
 
-## 🧪 Customization & Documentation
+These bindings are always available in the default mode.
 
-- Commands: [https://nikitabobko.github.io/AeroSpace/commands](https://nikitabobko.github.io/AeroSpace/commands)
-- Guide: [https://nikitabobko.github.io/AeroSpace/guide](https://nikitabobko.github.io/AeroSpace/guide)
-- GitHub: [https://github.com/nikitabobko/AeroSpace](https://github.com/nikitabobko/AeroSpace)
+| Action | Binding |
+| --- | --- |
+| Focus left | `Alt + h` |
+| Focus down | `Alt + j` |
+| Focus up | `Alt + k` |
+| Focus right | `Alt + l` |
+| Move window left | `Alt + Shift + h` |
+| Move window down | `Alt + Shift + j` |
+| Move window up | `Alt + Shift + k` |
+| Move window right | `Alt + Shift + l` |
+| Switch to workspace 1-7 | `Alt + 1..7` |
+| Move window to workspace 1-8 | `Alt + Shift + 1..8` |
+| Toggle fullscreen | `Alt + Shift + f` |
+| Tiles / layout cycle | `Alt + /` |
+| Accordion / layout cycle | `Alt + ,` |
+| Previous workspace | `Alt + Tab` |
+| Move workspace to next monitor | `Alt + Shift + Tab` |
+| Enter resize mode | `Alt + Shift + r` |
+| Enter service mode | `Alt + Shift + ;` |
 
----
+## Resize Mode
 
-## 🛠️ Troubleshooting
+Enter with:
 
-If something doesn't work as expected:
+- `Alt + Shift + r`
 
-- Ensure AeroSpace is granted all required permissions
-- Use `Alt + Shift + ;` to enter Service Mode
-- Press `r` to reset layout or `esc` to reload config
+Bindings:
 
----
+| Action | Binding |
+| --- | --- |
+| Shrink width | `h` |
+| Grow height | `j` |
+| Shrink height | `k` |
+| Grow width | `l` |
+| Balance sizes | `b` |
+| Smart shrink | `-` |
+| Smart grow | `=` |
+| Return to main mode | `Enter` |
+| Return to main mode | `Esc` |
 
-## License
+## Service Mode
 
-MIT License – customize and share freely.
+Enter with:
+
+- `Alt + Shift + ;`
+
+Bindings:
+
+| Action | Binding |
+| --- | --- |
+| Reload config and return to main mode | `Esc` |
+| Flatten workspace tree and return to main mode | `r` |
+| Toggle floating / tiling and return to main mode | `f` |
+| Close all windows except current and return to main mode | `Backspace` |
+| Join with left | `Alt + Shift + h` |
+| Join with down | `Alt + Shift + j` |
+| Join with up | `Alt + Shift + k` |
+| Join with right | `Alt + Shift + l` |
+
+## Layout and Gap Settings
+
+Current layout-related values from the config:
+
+- `default-root-container-layout = 'tiles'`
+- `default-root-container-orientation = 'auto'`
+- `enable-normalization-flatten-containers = true`
+- `enable-normalization-opposite-orientation-for-nested-containers = true`
+- `accordion-padding = 30`
+
+Current gaps:
+
+- `inner.horizontal = 5`
+- `inner.vertical = 5`
+- `outer.left = 5`
+- `outer.right = 5`
+- `outer.top = 5`
+- `outer.bottom = 5`
+
+## Workspace Notes
+
+Current active workspace bindings:
+
+- direct switching: `1` through `7`
+- move-node bindings: `1` through `8`
+
+Workspace `8` is available for moving windows, but direct switching to `8` is currently commented out in the config.
+
+## Maintenance Notes
+
+If you change:
+
+- keybindings
+- mode behavior
+- workspace range
+- gap values
+- startup behavior
+
+update both:
+
+- [aerospace.toml](aerospace.toml)
+- [README.md](README.md)
+
+Keep the README aligned with the actual config instead of documenting hypothetical bindings.
+
+## References
+
+- AeroSpace guide: https://nikitabobko.github.io/AeroSpace/guide
+- AeroSpace commands: https://nikitabobko.github.io/AeroSpace/commands
+- AeroSpace GitHub: https://github.com/nikitabobko/AeroSpace

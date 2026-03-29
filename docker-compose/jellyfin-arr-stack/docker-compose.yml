@@ -77,7 +77,7 @@ services:
   #     - /mnt/ssd/docker-volumes/arr/lidarr/music:/data/music
   #     - /mnt/ssd/docker-volumes/arr/qbittorrent/downloads:/downloads
   #   ports:
-  #     - 18686:8686
+  #     - 8686:8686
   #   restart: unless-stopped
 
   # readarr:
@@ -92,7 +92,7 @@ services:
   #     - /mnt/ssd/docker-volumes/arr/readarr/books:/data/books
   #     - /mnt/ssd/docker-volumes/arr/qbittorrent/downloads:/downloads
   #   ports:
-  #     - 18787:8787
+  #     - 8787:8787
   #   restart: unless-stopped
 
   homarr:
@@ -106,7 +106,9 @@ services:
       - /mnt/ssd/docker-volumes/arr/homarr/icons:/app/public/icons
       - /mnt/ssd/docker-volumes/arr/homarr/data:/data
     # ports:
-    #   - 17575:7575
+    #   - 7575:7575
+    networks:
+      - proxy
 
   qbittorrent:
     image: lscr.io/linuxserver/qbittorrent:latest

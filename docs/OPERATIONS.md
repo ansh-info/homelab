@@ -395,6 +395,35 @@ dig +short seerr.${DOMAIN_ROOT} @${TAILSCALE_IP}
 curl -vk --resolve seerr.${DOMAIN_ROOT}:443:${TAILSCALE_IP} https://seerr.${DOMAIN_ROOT}/
 ```
 
+## OpenClaw Notes
+
+OpenClaw should be treated as a stateful service.
+
+Highest-priority OpenClaw backup targets:
+
+- `${OPENCLAW_CONFIG_ROOT}`
+- `${OPENCLAW_WORKSPACE_ROOT}`
+
+OpenClaw uses the moving image tag `ghcr.io/openclaw/openclaw:latest` in this homelab, so upstream changes can affect redeploys and automated updates.
+
+Operational decision:
+
+- do not rely on Watchtower to update OpenClaw automatically
+- treat OpenClaw updates as intentional manual redeploys after validation
+- if automatic updates are ever enabled later, document that change explicitly in the OpenClaw stack guide first
+- current working provider/model path is OpenAI API-key auth with `openai/gpt-5.4-mini`
+
+After redeploying OpenClaw, verify:
+
+- container health
+- NPM routing to `openclaw-gateway:${OPENCLAW_GATEWAY_PORT}`
+- private access through `${OPENCLAW_HOSTNAME}`
+- Discord connectivity if the bot token is configured
+
+For first deployment details, Portainer env requirements, and recovery steps, see:
+
+- [stacks/openclaw.md](stacks/openclaw.md)
+
 ## Related Docs
 
 - [README.md](../README.md)

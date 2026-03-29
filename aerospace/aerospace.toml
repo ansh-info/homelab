@@ -1,17 +1,30 @@
-# after-startup-command
+# AeroSpace configuration for macOS.
+#
+# Maintenance notes:
+# - `main` mode contains the normal navigation and workspace bindings.
+# - `resize` mode is entered with `alt-shift-r` and exited with `enter` or `esc`.
+# - `service` mode is entered with `alt-shift-semicolon` and is used for reload,
+#   flatten, floating-layout toggle, and join operations.
+# - Workspaces `1` through `7` are directly selectable in normal use.
+# - `move-node-to-workspace 8` is available even though direct switching to
+#   workspace `8` is currently commented out.
+#
+# Reference: https://nikitabobko.github.io/AeroSpace/guide
+
+# Commands executed before/after AeroSpace startup.
 after-login-command = []
 
-
-# after-login-command is executed after AeroSpace is started.
 after-startup-command = []
 
 # Start AeroSpace at login
 start-at-login = true
 
-# Normalizations. See: https://nikitabobko.github.io/AeroSpace/guide#normalization
+# Normalize container layout to keep the tree easier to reason about.
+# See: https://nikitabobko.github.io/AeroSpace/guide#normalization
 enable-normalization-flatten-containers = true
 enable-normalization-opposite-orientation-for-nested-containers = true
 
+# Space between windows in accordion layout.
 accordion-padding = 30
 
 # Possible values: tiles|accordion
@@ -22,12 +35,14 @@ default-root-container-layout = 'tiles'
 #               tall monitor (anything higher than wide) gets vertical orientation
 default-root-container-orientation = 'auto'
 
+# Keyboard preset used for keybinding interpretation.
 # Possible values: (qwerty|dvorak)
 # See https://nikitabobko.github.io/AeroSpace/guide#key-mapping
 key-mapping.preset = 'qwerty'
 
 
 [gaps]
+# Uniform 5px gaps around and between containers.
 inner.horizontal = 5
 inner.vertical = 5
 outer.left = 5
@@ -38,7 +53,7 @@ outer.right = 5
 
 [mode.main.binding]
 
-
+# Main mode: default navigation and workspace actions.
 # See: https://nikitabobko.github.io/AeroSpace/commands#layout
 alt-slash = 'layout tiles horizontal vertical'
 alt-comma = 'layout accordion horizontal vertical'
@@ -56,6 +71,8 @@ alt-shift-k = 'move up'
 alt-shift-l = 'move right'
 
 
+# Workspace switching.
+# Direct switching is enabled for workspaces 1-7 in the current setup.
 # See: https://nikitabobko.github.io/AeroSpace/commands#workspace
 alt-1 = 'workspace 1'
 alt-2 = 'workspace 2'
@@ -74,6 +91,9 @@ alt-7 = 'workspace 7'
 # alt-t = 'workspace T'
 # alt-v = 'workspace V'
 
+# Move focused window to another workspace.
+# Workspace 8 is enabled for moving even though direct switching to workspace 8
+# is currently commented out above.
 # See: https://nikitabobko.github.io/AeroSpace/commands#move-node-to-workspace
 alt-shift-1 = 'move-node-to-workspace 1'
 alt-shift-2 = 'move-node-to-workspace 2'
@@ -96,21 +116,22 @@ alt-shift-f = 'fullscreen'
 
 # See: https://nikitabobko.github.io/AeroSpace/commands#workspace-back-and-forth
 alt-tab = 'workspace-back-and-forth'
+
 # See: https://nikitabobko.github.io/AeroSpace/commands#move-workspace-to-monitor
 alt-shift-tab = 'move-workspace-to-monitor --wrap-around next'
 
+# Mode entry points.
 # See: https://nikitabobko.github.io/AeroSpace/commands#mode
 alt-shift-semicolon = 'mode service'
-
 alt-shift-r = 'mode resize'
 
 [mode.resize.binding]
+# Resize mode: vim-style growth/shrink controls.
 h = 'resize width -50'
 j = 'resize height +50'
 k = 'resize height -50'
 l = 'resize width +50'
 b = 'balance-sizes'
-
 
 # See: https://nikitabobko.github.io/AeroSpace/commands#resize
 minus = 'resize smart -50'
@@ -119,7 +140,8 @@ equal = 'resize smart +50'
 enter = 'mode main'
 esc = 'mode main'
 
-# 'service' binding mode declaration.
+# Service mode: reload config, flatten, toggle floating layout, close others,
+# and join focused containers.
 # See: https://nikitabobko.github.io/AeroSpace/guide#binding-modes
 [mode.service.binding]
 esc = ['reload-config', 'mode main']
