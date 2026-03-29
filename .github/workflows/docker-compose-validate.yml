@@ -71,6 +71,17 @@ jobs:
             db_database_name: placeholder
             pihole_password: placeholder
             tailscale_ip: 127.0.0.1
+          - name: openclaw
+            path: docker-compose/openclaw
+            gpu: false
+            host_mounts: true
+            upload_location: /tmp/uploads-unused
+            db_data_location: /tmp/db-unused
+            db_password: placeholder
+            db_username: placeholder
+            db_database_name: placeholder
+            pihole_password: placeholder
+            tailscale_ip: 127.0.0.1
           - name: watchtower
             path: docker-compose/watchtower
             gpu: false
@@ -94,6 +105,7 @@ jobs:
         id: prepare-compose
         working-directory: ${{ matrix.path }}
         env:
+          OPENCLAW_GATEWAY_TOKEN: placeholder
           UPLOAD_LOCATION: ${{ matrix.upload_location }}
           DB_DATA_LOCATION: ${{ matrix.db_data_location }}
           DB_PASSWORD: ${{ matrix.db_password }}
@@ -114,6 +126,7 @@ jobs:
       - name: Validate docker-compose.yml for ${{ matrix.name }}
         working-directory: ${{ matrix.path }}
         env:
+          OPENCLAW_GATEWAY_TOKEN: placeholder
           UPLOAD_LOCATION: ${{ matrix.upload_location }}
           DB_DATA_LOCATION: ${{ matrix.db_data_location }}
           DB_PASSWORD: ${{ matrix.db_password }}
@@ -127,6 +140,7 @@ jobs:
         if: matrix.gpu == false && matrix.host_mounts == false
         working-directory: ${{ matrix.path }}
         env:
+          OPENCLAW_GATEWAY_TOKEN: placeholder
           UPLOAD_LOCATION: ${{ matrix.upload_location }}
           DB_DATA_LOCATION: ${{ matrix.db_data_location }}
           DB_PASSWORD: ${{ matrix.db_password }}
@@ -140,6 +154,7 @@ jobs:
         if: matrix.gpu == false && matrix.host_mounts == false && always()
         working-directory: ${{ matrix.path }}
         env:
+          OPENCLAW_GATEWAY_TOKEN: placeholder
           UPLOAD_LOCATION: ${{ matrix.upload_location }}
           DB_DATA_LOCATION: ${{ matrix.db_data_location }}
           DB_PASSWORD: ${{ matrix.db_password }}
