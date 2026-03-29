@@ -22,10 +22,15 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Install toml-lint
+      - name: Validate TOML syntax with Python
         run: |
-          curl -sSL https://github.com/pelletier/go-toml/releases/latest/download/toml-lint_linux_amd64.tar.gz | tar xz
-          sudo mv toml-lint /usr/local/bin/
+          python3 - <<'PY'
+          import pathlib
+          import tomllib
 
-      - name: Run toml-lint on aerospace config
-        run: toml-lint aerospace/aerospace.toml
+          config_path = pathlib.Path("aerospace/aerospace.toml")
+          with config_path.open("rb") as handle:
+              tomllib.load(handle)
+
+          print(f"Validated TOML syntax: {config_path}")
+          PY
