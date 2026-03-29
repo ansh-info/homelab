@@ -10,7 +10,7 @@ Reference compose file:
 
 ## Purpose
 
-Watchtower monitors Docker containers and updates eligible images automatically. In this homelab it is configured with label-based update control and a daily interval.
+Watchtower monitors Docker containers and updates eligible images automatically. In this homelab it is configured with a daily interval and is not currently restricted by label-based opt-in.
 
 ## Dependencies
 
@@ -18,7 +18,7 @@ Watchtower depends on:
 
 - Docker and Portainer
 - access to `/var/run/docker.sock`
-- a deliberate labeling strategy if label-based updates are expected
+- acceptance that Watchtower can evaluate any running container visible through the Docker socket
 
 ## Placeholder Variables
 
@@ -42,12 +42,12 @@ Current important details from the stack:
 - Docker socket mounted from the host
 - interval set to `86400` seconds
 - `--cleanup` enabled
-- `--label-enable` enabled
 - `--debug` enabled
 
 Meaning:
 
-- updates are not applied blindly to every container unless labeling is configured accordingly
+- updates are not limited to labeled containers by the checked-in compose file
+- Watchtower can evaluate and update running containers beyond the stacks defined in this repo
 - old images are cleaned up after updates
 - logs are verbose enough for debugging
 
@@ -85,7 +85,7 @@ docker ps --filter name=watchtower
 docker logs --tail 100 watchtower
 ```
 
-If label-based updating is intended, verify the target containers are labeled correctly in their stack definitions or runtime metadata.
+If label-based updating is desired in the future, the compose file would need to add `--label-enable` and the target containers would need the expected labels.
 
 ## Common Failure Modes
 
@@ -93,7 +93,8 @@ If label-based updating is intended, verify the target containers are labeled co
 
 Likely causes:
 
-- `--label-enable` is set, but target containers do not have the expected labels
+- no newer image is available for the running container
+- the image cannot be checked or pulled successfully
 
 ### A service changes unexpectedly after an update
 
