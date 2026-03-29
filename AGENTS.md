@@ -20,6 +20,11 @@ Agents should optimize for:
 - keeping the repo reproducible
 - updating docs whenever config conventions change
 
+## Formatting Rules
+
+- Do not use em dashes.
+- Use the normal short hyphen `-` instead.
+
 ## Architecture
 
 The current private access path is:
@@ -54,6 +59,7 @@ Current stack layout:
 - `docker-compose/jellyfin-arr-stack`
 - `docker-compose/immich`
 - `docker-compose/nextcloud-aio`
+- `docker-compose/openclaw`
 - `docker-compose/watchtower`
 
 If a new stack is added, place it under:
@@ -87,6 +93,7 @@ Examples:
 - `/mnt/ssd/docker-volumes/nginx-proxy-manager/data`
 - `/mnt/ssd/docker-volumes/immich/library`
 - `/mnt/ssd/docker-volumes/nextcloud/data`
+- `/mnt/ssd/docker-volumes/openclaw/config`
 - `/mnt/ssd/docker-volumes/arr/radarr/config`
 
 Do not introduce new scattered storage roots like:
@@ -266,6 +273,24 @@ Examples:
 - `feat: add uptime kuma stack`
 - `fix: correct nextcloud aio upstream port`
 - `docs: expand npm proxy host guide`
+
+### Commit Workflow Rules
+
+- Do not bundle unrelated work into one commit.
+- Commit files in a deliberate order that matches the work being done.
+- Prefer smaller focused commits over one large mixed commit.
+- Each commit message should clearly describe the specific change it contains.
+- Before committing, review the staged diff and confirm only the intended files are included.
+
+### Commit Attribution Rules
+
+- When creating commits, include these co-author trailers in the commit message.
+- The first co-author email should be `anshkumar.info@gmail.com`.
+- The second co-author trailer should be:
+
+```text
+Co-authored-by: Apoorva Gupta <apoorvaagupta.info@gmail.com>
+```
 
 Documentation-only and maintenance commits may still appear in release notes, but the meaningful version bumps should come from `feat`, `fix`, and explicit breaking changes.
 
