@@ -2,6 +2,30 @@
 
 <!-- version list -->
 
+## v1.1.1 (2026-03-30)
+
+### Bug Fixes
+
+- Clean tmux config and docs
+  ([`dff1574`](https://github.com/ansh-info/homelab/commit/dff1574333bdf792e90d2dae02a8732b0f3e0677))
+
+### Chores
+
+- Remove stale utils folder
+  ([`014e204`](https://github.com/ansh-info/homelab/commit/014e204d7203014773e8e8aed473c48e6c8f1337))
+
+### Documentation
+
+- Document discord guild setup for openclaw
+  ([`0306c61`](https://github.com/ansh-info/homelab/commit/0306c61ff67169add858ad61f565cab7aecc3eb4))
+
+- Modernize zshrc setup
+  ([`f2953f7`](https://github.com/ansh-info/homelab/commit/f2953f7731bebccc1ac600910cb5115ef90a89d2))
+
+- Update agent guidance after utils removal
+  ([`7c61d82`](https://github.com/ansh-info/homelab/commit/7c61d82119d37da826fa3c690b227c8674b70744))
+
+
 ## v1.1.0 (2026-03-29)
 
 ### Bug Fixes

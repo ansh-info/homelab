@@ -1,6 +1,6 @@
 [project]
 name = "homelab"
-version = "1.1.0"
+version = "1.1.1"
 description = "Homelab infrastructure, stacks, and operations source of truth"
 readme = "README.md"
 requires-python = ">=3.12"
