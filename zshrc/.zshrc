@@ -3,6 +3,8 @@ if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]
   source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
 fi
 
+[[ -o interactive ]] || return
+
 # Homebrew and base paths.
 eval "$(/opt/homebrew/bin/brew shellenv)"
 typeset -U path PATH fpath
@@ -21,62 +23,52 @@ export CPPFLAGS="-I/opt/homebrew/opt/openjdk@21/include"
 export EDITOR='nvim'
 export VISUAL='nvim'
 
-# Detect whether this shell has a real terminal attached.
-if [[ -t 0 && -t 1 ]]; then
-  ZSH_HAS_TTY=1
+export ZSH="$HOME/.oh-my-zsh"
+ZSH_THEME="powerlevel10k/powerlevel10k"
+plugins=(git zsh-autosuggestions)
+zstyle ':omz:update' mode disabled
+
+# Completions.
+[[ -d "$HOME/.docker/completions" ]] && fpath=("$HOME/.docker/completions" $fpath)
+autoload -Uz compinit
+local_zcomp_host="${HOST%%.*}"
+local_zcompdump="$HOME/.zcompdump-${local_zcomp_host}-$ZSH_VERSION"
+if [[ -r "$local_zcompdump" ]]; then
+  compinit -C -d "$local_zcompdump"
 else
-  ZSH_HAS_TTY=0
+  compinit -i -d "$local_zcompdump"
 fi
 
-# Oh My Zsh and prompt stack only need to load for real terminal sessions.
-if (( ZSH_HAS_TTY )); then
-  export ZSH="$HOME/.oh-my-zsh"
-  ZSH_THEME="powerlevel10k/powerlevel10k"
-  plugins=(git zsh-autosuggestions)
-  zstyle ':omz:update' mode disabled
+zstyle ':completion:*' use-cache on
+zstyle ':completion:*' cache-path "$HOME/.zcompcache"
+zstyle ':completion:*' menu select
+zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}'
+zstyle ':completion:*' completer _complete _match _approximate
+zstyle ':completion:*:match:*' original only
+zstyle ':completion:*:approximate:*' max-errors 1 numeric
+zstyle ':completion:*:*:*:*:*' menu select
+zstyle ':completion:*:matches' group yes
+zstyle ':completion:*:options' description yes
+zstyle ':completion:*:options' auto-description '%d'
+zstyle ':completion:*:corrections' format ' %F{green}-- %d (errors: %e) --%f'
+zstyle ':completion:*:descriptions' format ' %F{yellow}-- %d --%f'
+zstyle ':completion:*:messages' format ' %F{purple}-- %d --%f'
+zstyle ':completion:*:warnings' format ' %F{red}-- no matches found --%f'
+zstyle ':completion:*' format ' %F{yellow}-- %d --%f'
+zstyle ':completion:*:*:kill:*:processes' list-colors '=(#b) #([0-9]#) ([0-9a-z-]#)*=01;34=0=01'
+zstyle ':completion:*' list-colors ${(s.:.)LS_COLORS}
 
-  # Completions.
-  [[ -d "$HOME/.docker/completions" ]] && fpath=("$HOME/.docker/completions" $fpath)
-  autoload -Uz compinit
-  local_zcomp_host="${HOST%%.*}"
-  local_zcompdump="$HOME/.zcompdump-${local_zcomp_host}-$ZSH_VERSION"
-  if [[ -r "$local_zcompdump" ]]; then
-    compinit -C -d "$local_zcompdump"
-  else
-    compinit -i -d "$local_zcompdump"
-  fi
+source "$ZSH/oh-my-zsh.sh"
 
-  zstyle ':completion:*' use-cache on
-  zstyle ':completion:*' cache-path "$HOME/.zcompcache"
-  zstyle ':completion:*' menu select
-  zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}'
-  zstyle ':completion:*' completer _complete _match _approximate
-  zstyle ':completion:*:match:*' original only
-  zstyle ':completion:*:approximate:*' max-errors 1 numeric
-  zstyle ':completion:*:*:*:*:*' menu select
-  zstyle ':completion:*:matches' group yes
-  zstyle ':completion:*:options' description yes
-  zstyle ':completion:*:options' auto-description '%d'
-  zstyle ':completion:*:corrections' format ' %F{green}-- %d (errors: %e) --%f'
-  zstyle ':completion:*:descriptions' format ' %F{yellow}-- %d --%f'
-  zstyle ':completion:*:messages' format ' %F{purple}-- %d --%f'
-  zstyle ':completion:*:warnings' format ' %F{red}-- no matches found --%f'
-  zstyle ':completion:*' format ' %F{yellow}-- %d --%f'
-  zstyle ':completion:*:*:kill:*:processes' list-colors '=(#b) #([0-9]#) ([0-9a-z-]#)*=01;34=0=01'
-  zstyle ':completion:*' list-colors ${(s.:.)LS_COLORS}
+# Powerlevel10k prompt tuning.
+typeset -g POWERLEVEL9K_VCS_MAX_SYNC_LATENCY_SECONDS=0.2
+typeset -g POWERLEVEL9K_VCS_BACKENDS=(git)
+typeset -g POWERLEVEL9K_VCS_DISABLED_DIR_PATTERN='~/(Library|Movies|node_modules|.cache)(/|$)|/Volumes(/|$)'
+[[ -f "$HOME/.p10k.zsh" ]] && source "$HOME/.p10k.zsh"
 
-  source "$ZSH/oh-my-zsh.sh"
-
-  # Powerlevel10k prompt tuning.
-  typeset -g POWERLEVEL9K_VCS_MAX_SYNC_LATENCY_SECONDS=0.2
-  typeset -g POWERLEVEL9K_VCS_BACKENDS=(git)
-  typeset -g POWERLEVEL9K_VCS_DISABLED_DIR_PATTERN='~/(Library|Movies|node_modules|.cache)(/|$)|/Volumes(/|$)'
-  [[ -f "$HOME/.p10k.zsh" ]] && source "$HOME/.p10k.zsh"
-
-  # Syntax highlighting should load after Oh My Zsh.
-  if [[ -r "$HOME/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh" ]]; then
-    source "$HOME/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
-  fi
+# Syntax highlighting should load after Oh My Zsh.
+if [[ -r "$HOME/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh" ]]; then
+  source "$HOME/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
 fi
 
 # Aliases and helpers.
@@ -131,7 +123,7 @@ precmd_functions+=(_nvm_use_default_once)
 eval "$(zoxide init zsh)"
 
 # uv completions from cache.
-if (( ZSH_HAS_TTY )) && command -v uv >/dev/null 2>&1; then
+if command -v uv >/dev/null 2>&1; then
   _uv_dir="$HOME/.cache/uv"
   _uv_comp="$_uv_dir/_uv.zsh"
   [[ -r "$_uv_comp" ]] || {
