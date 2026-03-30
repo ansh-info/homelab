@@ -2,6 +2,14 @@
 
 <!-- version list -->
 
+## v1.1.2 (2026-03-30)
+
+### Bug Fixes
+
+- Clean zshrc lazy loading
+  ([`0d9ebad`](https://github.com/ansh-info/homelab/commit/0d9ebad770522c9e6d94901400d16d16d173b9e0))
+
+
 ## v1.1.1 (2026-03-30)
 
 ### Bug Fixes
