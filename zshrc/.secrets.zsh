@@ -1,28 +1,22 @@
-# Environment variables
+# Local shell secrets template.
+# Copy the variable names you actually use and replace the placeholder values locally.
 
-# OPENAI API KEY
-export OPENAI_API_KEY=your_openai_api_key_here
+# OpenAI
+export OPENAI_API_KEY='your_openai_api_key_here'
 
-# LangSmith API KEY
-export LANGCHAIN_TRACING_V2=false
-export LANGCHAIN_API_KEY=your_langchain_api_key_here
+# NVIDIA / NGC
+export NGC_API_KEY='your_ngc_api_key_here'
+export NVIDIA_API_KEY='your_nvidia_api_key_here'
 
-# Zotero API KEY
-export ZOTERO_API_KEY=your_zotero_api_key_here
-export ZOTERO_USER_ID=your_zotero_user_id_here
+# Hugging Face
+export HF_TOKEN='your_hugging_face_token_here'
+export HUGGING_FACE_HUB_TOKEN='your_hugging_face_hub_token_here'
 
-# Nvidia API KEY
-export NVIDIA_API_KEY=your_nvidia_api_key_here
+# Weights & Biases
+export WANDB_API_KEY='your_wandb_api_key_here'
+export WANDB_BASE_URL='https://your-wandb-instance.example.com'
+export WANDB_ENTITY='your_wandb_entity_here'
+export WANDB_PROJECT='your_wandb_project_here'
 
-# TAVILY_API_KEY
-export TAVILY_API_KEY=your_tavily_api_key_here
-
-# Kaggle API KEY
-export KAGGLE_USERNAME=your_kaggle_username_here
-export KAGGLE_KEY=your_kaggle_key_here
-
-# PYPI
-export PYPI_AUTH_TOKEN=your_pypi_token_here
-
-# and any other sensitive information...
-alias homelab='ssh homelab@<ip_address>'
+# Private aliases and other local-only shell settings.
+alias homelab='ssh homelab@<your-homelab-ip>'

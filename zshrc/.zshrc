@@ -1,93 +1,105 @@
-# ===== Powerlevel10k Instant Prompt (keep at very top) =====
+# Powerlevel10k instant prompt must stay at the top.
 if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
   source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
 fi
 
-# ===== Paths =====
-export PATH="/opt/homebrew/opt/openjdk@21/bin:/Library/TeX/texbin:/Applications/Docker.app/Contents/Resources/bin:/opt/homebrew/bin:/usr/bin:/bin:/usr/sbin:/sbin:$PATH"
+# Homebrew and base paths.
+eval "$(/opt/homebrew/bin/brew shellenv)"
+typeset -U path PATH fpath
+
+path=(
+  /opt/homebrew/opt/openjdk@21/bin
+  /opt/homebrew/opt/perl/bin
+  /Library/TeX/texbin
+  /Applications/Docker.app/Contents/Resources/bin
+  $path
+)
+
+export PATH
 export JAVA_HOME="/opt/homebrew/opt/openjdk@21"
 export CPPFLAGS="-I/opt/homebrew/opt/openjdk@21/include"
-
-# ===== Oh My Zsh =====
-export ZSH="$HOME/.oh-my-zsh"
-ZSH_THEME="powerlevel10k/powerlevel10k"
-plugins=(git zsh-autosuggestions)
-zstyle ':omz:update' mode disabled
-
-# ===== Completions (quiet, cached) =====
-autoload -Uz compinit
-# add optional completion dirs before compinit
-[[ -d /Users/anshkumar/.docker/completions ]] && fpath=(/Users/anshkumar/.docker/completions $fpath)
-# Use versioned dump; skip expensive security audit
-if [[ -r ~/.zcompdump-$ZSH_VERSION ]]; then
-  compinit -C -d ~/.zcompdump-$ZSH_VERSION
-else
-  compinit -i -d ~/.zcompdump-$ZSH_VERSION
-fi
-
-# Your completion styles
-zstyle ':completion:*' use-cache on
-zstyle ':completion:*' cache-path "$HOME/.zcompcache"
-zstyle ':completion:*' menu select
-zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}'
-zstyle ':completion:*' completer _complete _match _approximate
-zstyle ':completion:*:match:*' original only
-zstyle ':completion:*:approximate:*' max-errors 1 numeric
-zstyle ':completion:*:*:*:*:*' menu select
-zstyle ':completion:*:matches' group 'yes'
-zstyle ':completion:*:options' description 'yes'
-zstyle ':completion:*:options' auto-description '%d'
-zstyle ':completion:*:corrections' format ' %F{green}-- %d (errors: %e) --%f'
-zstyle ':completion:*:descriptions' format ' %F{yellow}-- %d --%f'
-zstyle ':completion:*:messages' format ' %F{purple} -- %d --%f'
-zstyle ':completion:*:warnings' format ' %F{red}-- no matches found --%f'
-zstyle ':completion:*' format ' %F{yellow}-- %d --%f'
-zstyle ':completion:*:*:kill:*:processes' list-colors '=(#b) #([0-9]#) ([0-9a-z-]#)*=01;34=0=01'
-zstyle ':completion:*' list-colors ${(s.:.)LS_COLORS}
-
-# ===== Source Oh My Zsh (loads plugins) =====
-source $ZSH/oh-my-zsh.sh
-
-# ===== Powerlevel10k speed knobs =====
-typeset -g POWERLEVEL9K_VCS_MAX_SYNC_LATENCY_SECONDS=0.2
-typeset -g POWERLEVEL9K_VCS_BACKENDS=(git)
-typeset -g POWERLEVEL9K_VCS_DISABLED_DIR_PATTERN='~/(Library|Movies|node_modules|.cache)(/|$)|/Volumes(/|$)'
-[[ -f ~/.p10k.zsh ]] && source ~/.p10k.zsh
-
-# ===== Prompt-related plugins order =====
-# Keep syntax highlighting LAST so it sees the final prompt
-if [[ -r /Users/anshkumar/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh ]]; then
-  source /Users/anshkumar/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
-fi
-
-# ===== Editor & Aliases =====
 export EDITOR='nvim'
 export VISUAL='nvim'
+
+# Detect whether this shell has a real terminal attached.
+if [[ -t 0 && -t 1 ]]; then
+  ZSH_HAS_TTY=1
+else
+  ZSH_HAS_TTY=0
+fi
+
+# Oh My Zsh and prompt stack only need to load for real terminal sessions.
+if (( ZSH_HAS_TTY )); then
+  export ZSH="$HOME/.oh-my-zsh"
+  ZSH_THEME="powerlevel10k/powerlevel10k"
+  plugins=(git zsh-autosuggestions)
+  zstyle ':omz:update' mode disabled
+
+  # Completions.
+  [[ -d "$HOME/.docker/completions" ]] && fpath=("$HOME/.docker/completions" $fpath)
+  autoload -Uz compinit
+  local_zcomp_host="${HOST%%.*}"
+  local_zcompdump="$HOME/.zcompdump-${local_zcomp_host}-$ZSH_VERSION"
+  if [[ -r "$local_zcompdump" ]]; then
+    compinit -C -d "$local_zcompdump"
+  else
+    compinit -i -d "$local_zcompdump"
+  fi
+
+  zstyle ':completion:*' use-cache on
+  zstyle ':completion:*' cache-path "$HOME/.zcompcache"
+  zstyle ':completion:*' menu select
+  zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}'
+  zstyle ':completion:*' completer _complete _match _approximate
+  zstyle ':completion:*:match:*' original only
+  zstyle ':completion:*:approximate:*' max-errors 1 numeric
+  zstyle ':completion:*:*:*:*:*' menu select
+  zstyle ':completion:*:matches' group yes
+  zstyle ':completion:*:options' description yes
+  zstyle ':completion:*:options' auto-description '%d'
+  zstyle ':completion:*:corrections' format ' %F{green}-- %d (errors: %e) --%f'
+  zstyle ':completion:*:descriptions' format ' %F{yellow}-- %d --%f'
+  zstyle ':completion:*:messages' format ' %F{purple}-- %d --%f'
+  zstyle ':completion:*:warnings' format ' %F{red}-- no matches found --%f'
+  zstyle ':completion:*' format ' %F{yellow}-- %d --%f'
+  zstyle ':completion:*:*:kill:*:processes' list-colors '=(#b) #([0-9]#) ([0-9a-z-]#)*=01;34=0=01'
+  zstyle ':completion:*' list-colors ${(s.:.)LS_COLORS}
+
+  source "$ZSH/oh-my-zsh.sh"
+
+  # Powerlevel10k prompt tuning.
+  typeset -g POWERLEVEL9K_VCS_MAX_SYNC_LATENCY_SECONDS=0.2
+  typeset -g POWERLEVEL9K_VCS_BACKENDS=(git)
+  typeset -g POWERLEVEL9K_VCS_DISABLED_DIR_PATTERN='~/(Library|Movies|node_modules|.cache)(/|$)|/Volumes(/|$)'
+  [[ -f "$HOME/.p10k.zsh" ]] && source "$HOME/.p10k.zsh"
+
+  # Syntax highlighting should load after Oh My Zsh.
+  if [[ -r "$HOME/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh" ]]; then
+    source "$HOME/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
+  fi
+fi
+
+# Aliases and helpers.
 alias v='nvim'
 alias vi='nvim'
 alias vim='nvim'
 alias ls='eza'
-alias zshrc='vi ~/.zshrc'
-alias conf='cd ~/.config/ && vi .'
+alias zshrc='nvim ~/.zshrc'
+alias conf='cd ~/.config/ && nvim .'
 alias szshrc='source ~/.zshrc'
+alias secrets='nvim ~/.secrets.zsh'
 alias svenv='source .venv/bin/activate'
 alias c='clear'
-alias y='yazi'
-# alias brewup="brew update && brew upgrade && brew cleanup"
 alias zi='zoxide query --interactive'
 
-# Smarter brew updater + uv completion refresh
 brewup() {
-  # Remember uv version (if present) before upgrade
   local uv_before="" uv_after=""
   if command -v uv >/dev/null 2>&1; then
     uv_before="$(uv --version 2>/dev/null)"
   fi
 
-  # Do the usual Homebrew maintenance
   brew update && brew upgrade && brew cleanup || return $?
 
-  # If uv exists, refresh completion when needed
   if command -v uv >/dev/null 2>&1; then
     uv_after="$(uv --version 2>/dev/null)"
     if [[ "$uv_before" != "$uv_after" || ! -r "$HOME/.cache/uv/_uv.zsh" ]]; then
@@ -98,14 +110,16 @@ brewup() {
   fi
 }
 
-# ===== NVM (lazy load; preserves default-node behavior) =====
+# Lazy-load NVM while preserving the default node selection.
 export NVM_DIR="$HOME/.nvm"
-_lazy_nvm() { unset -f node npm npx nvm; [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"; }
+_lazy_nvm() {
+  unset -f node npm npx nvm
+  [[ -s "$NVM_DIR/nvm.sh" ]] && . "$NVM_DIR/nvm.sh"
+}
 nvm()  { _lazy_nvm; command nvm "$@"; }
 node() { _lazy_nvm; command node "$@"; }
-npm()  { _lazy_nvm; command npm  "$@"; }
-npx()  { _lazy_nvm; command npx  "$@"; }
-# Emulate "nvm use default" once per session without startup cost
+npm()  { _lazy_nvm; command npm "$@"; }
+npx()  { _lazy_nvm; command npx "$@"; }
 _nvm_use_default_once() {
   unset -f _nvm_use_default_once
   command -v nvm >/dev/null || _lazy_nvm
@@ -113,54 +127,35 @@ _nvm_use_default_once() {
 }
 precmd_functions+=(_nvm_use_default_once)
 
-# ===== Conda (lazy, no Python subprocess at startup) =====
-export CONDA_HOME="/opt/homebrew/Caskroom/miniconda/base"
-export PATH="$CONDA_HOME/bin:$PATH"  # discover `conda` without activating base
-__load_conda() {
-  unset -f conda __conda_hashr
-  if [[ -f "$CONDA_HOME/etc/profile.d/conda.sh" ]]; then
-    . "$CONDA_HOME/etc/profile.d/conda.sh"
-  fi
-  # To auto-activate base each session, uncomment:
-  # conda activate base >/dev/null 2>&1
-}
-conda() { __load_conda; conda "$@"; }
-__conda_hashr() { __load_conda; hash -r; }
-
-# ===== zoxide =====
+# zoxide.
 eval "$(zoxide init zsh)"
 
-# ===== uv / uvx completions (cached, no per-launch exec) =====
-# Generate once, then source from cache
-_uv_dir="$HOME/.cache/uv"
-_uv_comp="$_uv_dir/_uv.zsh"
-if command -v uv >/dev/null; then
-  [[ -r "$_uv_comp" ]] || { mkdir -p "$_uv_dir"; uv generate-shell-completion zsh >"$_uv_comp" 2>/dev/null; }
+# uv completions from cache.
+if (( ZSH_HAS_TTY )) && command -v uv >/dev/null 2>&1; then
+  _uv_dir="$HOME/.cache/uv"
+  _uv_comp="$_uv_dir/_uv.zsh"
+  [[ -r "$_uv_comp" ]] || {
+    mkdir -p "$_uv_dir"
+    uv generate-shell-completion zsh > "$_uv_comp" 2>/dev/null
+  }
   source "$_uv_comp"
 fi
-# If you really want a separate uvx completion file, uncomment below:
-# _uvx_comp="$_uv_dir/_uvx.zsh"
-# if command -v uvx >/dev/null; then
-#   [[ -r "$_uvx_comp" ]] || { mkdir -p "$_uv_dir"; uvx --generate-shell-completion zsh >"$_uvx_comp" 2>/dev/null; }
-#   source "$_uvx_comp"
-# fi
 
-# ===== Built-in clear (instant) =====
+# Input and shell behavior.
 bindkey '^L' clear-screen
-
-# ===== Secrets (keep API keys out of this file) =====
-[[ -f "$HOME/.secrets.zsh" ]] && source "$HOME/.secrets.zsh"
-
-# configure LaTeX environment
-[[ -f "$HOME/.latex.zsh" ]] && source "$HOME/.latex.zsh"
-
-eval "$(/opt/homebrew/bin/brew shellenv)"
-eval "$(/opt/homebrew/bin/brew shellenv)"
-export PATH="/opt/homebrew/opt/perl/bin:$PATH"
-export PATH="/Library/TeX/texbin:$PATH"
-
-# vim: set ft=zsh
 bindkey -v
 
-# For Apple Silicon Macs (M1, M2)
-export PATH="/opt/homebrew/bin:$PATH"
+# Local secrets.
+[[ -f "$HOME/.secrets.zsh" ]] && source "$HOME/.secrets.zsh"
+
+# yazi wrapper that keeps shell cwd in sync.
+y() {
+  local tmp cwd
+  tmp="$(mktemp -t yazi-cwd.XXXXXX)"
+  command yazi "$@" --cwd-file="$tmp"
+  IFS= read -r -d '' cwd < "$tmp"
+  [[ -n "$cwd" && "$cwd" != "$PWD" ]] && builtin cd -- "$cwd"
+  rm -f -- "$tmp"
+}
+
+# vim: set ft=zsh

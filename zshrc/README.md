@@ -1,143 +1,111 @@
-# Zsh Configuration
+# Zsh Setup
 
-This is a customized Zsh configuration built for an enhanced developer experience with fast navigation, powerful autocompletions, prompt theming, and integration with modern CLI tools.
+This directory contains the current Zsh setup used on the Mac.
 
-## Features
+Source files:
 
-- Prompt powered by `powerlevel10k`
-- Plugin management via `oh-my-zsh`
-- Auto-suggestions, syntax highlighting, fuzzy matching
-- Support for completions from Docker, NPM, pip, kubectl
-- Interactive directory jumping with `zoxide`
-- Pre-configured aliases for productivity
-- Python virtualenv support
-- Java (JDK 21) and Conda environment setup
-- NVM (Node Version Manager) initialization
+- [`.zshrc`](.zshrc)
+- [`.secrets.zsh`](.secrets.zsh)
 
----
+The setup is optimized for:
 
-## Installation
+- fast interactive shell startup
+- a clean split between public shell config and private local secrets
+- modern CLI tooling on Apple Silicon macOS
 
-### 1. Install Zsh
+## Current Behavior
 
-Zsh is typically preinstalled on macOS. Confirm with:
+The current shell config uses:
 
-```bash
-zsh --version
-```
+- `oh-my-zsh`
+- `powerlevel10k`
+- `zsh-autosuggestions`
+- `zsh-syntax-highlighting`
+- cached completions via `compinit`
+- lazy-loaded `nvm`
+- cached `uv` completions
+- `zoxide`
+- `eza`
+- a `y()` wrapper that keeps the shell working directory in sync with `yazi`
 
-If not installed:
+The current config also:
 
-```bash
-brew install zsh
-```
+- uses `brew shellenv`
+- sets up `JAVA_HOME` for `openjdk@21`
+- adds Homebrew, Docker app, Perl, and TeX paths
+- skips the heavier prompt/completion stack for non-TTY shell invocations
 
-### 2. Install Oh My Zsh
+Conda is intentionally not part of the current setup anymore.
 
-```bash
-sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
-```
+## Files
 
-### 3. Install Powerlevel10k Theme
+### `.zshrc`
 
-```bash
-git clone --depth=1 https://github.com/romkatv/powerlevel10k.git \
-  ${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k
-```
+This is the main shell configuration.
 
-Set `ZSH_THEME="powerlevel10k/powerlevel10k"` in your `.zshrc`.
+It includes:
 
-### 4. Install Plugins
+- prompt and plugin loading
+- completion setup
+- aliases
+- lazy `nvm`
+- `zoxide`
+- `uv` completion cache loading
+- sourcing of `~/.secrets.zsh`
 
-#### Zsh Syntax Highlighting
+### `.secrets.zsh`
 
-```bash
-git clone https://github.com/zsh-users/zsh-syntax-highlighting.git \
-  ${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting
-```
+This is a template for local-only shell secrets and private aliases.
 
-#### Zsh Autosuggestions
+It is intended for values such as:
 
-```bash
-git clone https://github.com/zsh-users/zsh-autosuggestions \
-  ${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
-```
+- `OPENAI_API_KEY`
+- `NGC_API_KEY`
+- `NVIDIA_API_KEY`
+- `HF_TOKEN`
+- `HUGGING_FACE_HUB_TOKEN`
+- `WANDB_*`
+- private host aliases like `homelab`
 
-#### Other Required Tools
+The checked-in file must always keep placeholders only.
 
-Ensure these are installed:
+## Required Tools
 
-```bash
-brew install colorls zoxide nvm conda
-brew install kubectl docker npm pip
-```
-
-Also, ensure `nvim` is installed and aliased correctly.
-
----
-
-## Aliases Overview
-
-| Alias            | Description                               |
-| ---------------- | ----------------------------------------- |
-| `v`, `vi`, `vim` | Open Neovim                               |
-| `ls`             | Use `colorls` for enhanced `ls`           |
-| `zshrc`          | Edit `.zshrc` with Neovim                 |
-| `szshrc`         | Source `.zshrc`                           |
-| `venv`           | Create Python virtualenv                  |
-| `svenv`          | Activate virtualenv                       |
-| `c`              | Clear terminal                            |
-| `y`              | Launch `yazi` terminal file manager       |
-| `brewup`         | Update, upgrade, and cleanup Homebrew     |
-| `homelab`        | SSH into home server                      |
-| `zi`             | Interactive directory search via `zoxide` |
-
----
-
-## Prompt Setup
-
-To customize the prompt, run:
+Install the tools used by the current config:
 
 ```bash
-p10k configure
+brew install zsh eza zoxide nvm
+brew install --cask docker
 ```
 
-Or manually edit: `~/.p10k.zsh`
+Also install:
 
----
+- Oh My Zsh
+- Powerlevel10k
+- `zsh-autosuggestions`
+- `zsh-syntax-highlighting`
+- `nvim`
+- `yazi`
+- `uv`
 
-## Optional: Enable Completions
+## Current Aliases and Helpers
 
-Ensure CLI tools like `docker`, `npm`, `pip`, and `kubectl` are installed and their completions are sourced.
+| Name | Purpose |
+| --- | --- |
+| `v`, `vi`, `vim` | open Neovim |
+| `ls` | use `eza` |
+| `zshrc` | edit `~/.zshrc` |
+| `secrets` | edit `~/.secrets.zsh` |
+| `szshrc` | source `~/.zshrc` |
+| `svenv` | activate `.venv` |
+| `c` | clear the screen |
+| `zi` | interactive `zoxide` query |
+| `brewup` | update/upgrade/cleanup Homebrew and refresh cached `uv` completion if needed |
+| `y()` | launch `yazi` and `cd` into the selected directory afterward |
 
-This is handled automatically in the configuration using conditional checks.
+## Notes
 
----
-
-## Environment Integrations
-
-- **Node.js:** Uses `nvm` to manage Node versions. Default version is loaded on startup.
-- **Java:** Configured for JDK 21 via Homebrew.
-- **Python:** Conda environment initialized via `conda init`.
-
----
-
-## Cache & Completion Optimization
-
-- Completions are cached for better performance
-- Fuzzy and approximate matching is enabled for mistyped inputs
-- Menu selection and enhanced color formatting for autocompletion
-
----
-
-## File Locations
-
-- `~/.zshrc` – Main shell configuration
-- `~/.p10k.zsh` – Powerlevel10k prompt config
-- `~/.oh-my-zsh/custom/plugins/` – Custom plugin paths
-
----
-
-## License
-
-MIT License
+- The repo copy of [`.zshrc`](.zshrc) should track the live `~/.zshrc`.
+- The repo copy of [`.secrets.zsh`](.secrets.zsh) should remain a placeholder template only.
+- Keep machine-specific private values out of [`.zshrc`](.zshrc) when they belong in [`.secrets.zsh`](.secrets.zsh).
+- If the shell setup changes, update both the config files and this README together.
