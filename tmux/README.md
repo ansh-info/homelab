@@ -1,52 +1,43 @@
 # Tmux Setup
 
-This directory contains the tmux configuration used in this repo.
+This directory contains the tmux configuration used on the Mac host.
 
 Current files:
 
-- [.tmux.conf](.tmux.conf): main tmux configuration
+- [.tmux.conf](./.tmux.conf): main tmux configuration
 
-This README explains the current behavior, plugin assumptions, installation steps, and maintenance notes for the actual config in this directory.
+This README documents the actual behavior of the config in this directory, not a generic tmux setup.
 
-## Current Setup
+## Overview
 
-The current tmux config is built around:
+The current tmux setup is built around:
 
-- `Ctrl-a` as the tmux prefix
+- `Ctrl-a` as the prefix
 - `zsh` as the default shell
-- vi-style navigation and copy mode
 - mouse support
+- vi-style copy mode and pane navigation
 - top status bar
-- Catppuccin theme integration
-- persistent sessions using `tmux-resurrect` and `tmux-continuum`
-- clipboard integration using `pbcopy`
+- Catppuccin theme
+- persistent sessions with `tmux-resurrect` and `tmux-continuum`
+- macOS clipboard integration through `pbcopy`
 
-## Main Config Behavior
+## Core Behavior
 
-Current highlights from [.tmux.conf](.tmux.conf):
+Current defaults from [.tmux.conf](./.tmux.conf):
 
-- prefix:
-  - `Ctrl-a`
-- default terminal:
-  - `tmux-256color`
-- terminal override:
-  - `xterm-256color:RGB`
-- mouse:
-  - enabled
-- window numbering:
-  - starts at `1`
-- pane numbering:
-  - starts at `1`
-- history limit:
-  - `10000`
-- clipboard:
-  - enabled
-- status bar position:
-  - top
+- terminal: `tmux-256color`
+- RGB override: `xterm-256color:RGB`
+- mouse: enabled
+- window numbering: starts at `1`
+- pane numbering: starts at `1`
+- history limit: `10000`
+- clipboard integration: enabled
+- status bar position: top
+- window renumbering: enabled
 
 ## Keybindings
 
-Current important bindings:
+Important bindings:
 
 | Action | Binding |
 | --- | --- |
@@ -68,36 +59,32 @@ Current important bindings:
 
 ## Copy Mode
 
-Current copy-mode behavior uses vi keys.
-
-Bindings:
+Copy mode uses vi keys.
 
 | Action | Binding |
 | --- | --- |
 | Begin selection | `v` |
 | Copy selection to macOS clipboard | `y` |
 | Toggle rectangle selection | `r` |
-| Mouse drag copy to clipboard | mouse drag end |
+| Copy with mouse drag | drag and release |
 
-Clipboard copy uses:
+This setup is macOS-specific because it depends on:
 
 - `pbcopy`
-
-This config is therefore clearly macOS-oriented.
 
 ## Pane and Window Behavior
 
 Current behavior:
 
-- pane splitting preserves the current pane path
-- new windows open in the current pane path
-- windows are renumbered automatically when one is closed
+- pane splits inherit the current working directory
+- new windows open in the current working directory
 - activity monitoring is enabled
-- visual activity notification is disabled
+- visual activity notifications are disabled
+- windows are renumbered automatically after close
 
 ## Plugins
 
-Current plugin list from the config:
+Current plugin list:
 
 - `tmux-plugins/tpm`
 - `tmux-plugins/tmux-sensible`
@@ -108,7 +95,7 @@ Current plugin list from the config:
 - `tmux-plugins/tmux-yank`
 - `fcsonline/tmux-thumbs`
 
-Current plugin-related settings:
+Current plugin settings:
 
 - `@continuum-restore = on`
 - `@resurrect-capture-pane-contents = on`
@@ -118,58 +105,51 @@ Current plugin-related settings:
 
 ## Status Bar
 
-Current status bar behavior:
+The current status line uses Catppuccin.
 
-- shown at the top
-- left side is empty
-- right side includes Catppuccin segments for:
+Current layout:
+
+- top status bar
+- empty left side
+- right side modules:
   - application
   - CPU
   - session
   - uptime
   - battery
 
-Current relevant settings:
+Relevant settings:
 
-- `status-right-length = 100`
+- `status-left = ""`
 - `status-left-length = 100`
+- `status-right-length = 100`
 
-## Shell and Command Behavior
+The battery and CPU segments are provided through Catppuccin's status modules. This repo no longer documents the older mixed plugin-path setup.
+
+## Shell Integration
 
 Current shell settings:
 
 - `default-shell /bin/zsh`
 - `default-command "exec /bin/zsh"`
-- `default-command zsh`
+- `update-environment -r`
+- `focus-events on`
+- `allow-passthrough on`
 
 This config assumes:
 
-- `zsh` exists
+- `zsh` exists at `/bin/zsh`
 - `pbcopy` exists
-- plugin files are available in the expected plugin directories
+- TPM plugins are installed under `~/.tmux/plugins`
 
-## Plugin Path Assumptions
+## Plugin Path Model
 
-The config currently loads plugins from two different locations:
+The current config uses one consistent plugin path model:
 
-- `~/.config/tmux/plugins/...`
-- `~/.tmux/plugins/tpm/tpm`
+- Catppuccin is loaded from `~/.tmux/plugins/tmux/catppuccin.tmux`
+- TPM is initialized from `~/.tmux/plugins/tpm/tpm`
 
-Specifically:
-
-```tmux
-run ~/.config/tmux/plugins/catppuccin/tmux/catppuccin.tmux
-run ~/.config/tmux/plugins/tmux-plugins/tmux-cpu/cpu.tmux
-run ~/.config/tmux/plugins/tmux-plugins/tmux-battery/battery.tmux
-run '~/.tmux/plugins/tpm/tpm'
-```
-
-That means the current setup assumes:
-
-- TPM itself is installed under `~/.tmux/plugins/tpm`
-- some plugins are available under `~/.config/tmux/plugins/...`
-
-If you want a cleaner setup later, this is one of the first things worth normalizing.
+This is intentionally aligned with TPM's default install location.
 
 ## Install on macOS
 
@@ -185,21 +165,19 @@ Install TPM:
 git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
 ```
 
-Then install plugins from inside tmux with:
-
-```text
-Prefix + I
-```
-
-## Install This Config
-
-Copy the config into place:
+Copy the repo config into place:
 
 ```bash
 cp tmux/.tmux.conf ~/.tmux.conf
 ```
 
-Then reload inside tmux:
+Start tmux and install plugins:
+
+```text
+Prefix + I
+```
+
+Reload config later with:
 
 ```text
 Prefix + r
@@ -209,21 +187,22 @@ Prefix + r
 
 If you change:
 
-- prefix
-- shell settings
-- plugin list
-- plugin path assumptions
+- prefix bindings
 - copy-mode behavior
-- status bar layout
+- shell integration
+- plugin list
+- Catppuccin status modules
+- plugin load paths
 
 update both:
 
-- [.tmux.conf](.tmux.conf)
-- [README.md](README.md)
+- [.tmux.conf](./.tmux.conf)
+- [README.md](./README.md)
 
-Keep the README aligned with the actual config rather than documenting a generic tmux setup.
+Keep this README aligned with the checked-in config, not the live machine by memory.
 
 ## References
 
 - tmux docs: https://github.com/tmux/tmux/wiki
 - TPM: https://github.com/tmux-plugins/tpm
+- Catppuccin tmux: https://github.com/catppuccin/tmux

@@ -50,7 +50,6 @@ Key directories:
 - `docker-compose/`: compose definitions grouped by stack
 - `docs/`: rebuild, networking, operations, and stack docs
 - `docs/stacks/`: stack-specific docs
-- `utils/`: helper scripts
 
 Current stack layout:
 
