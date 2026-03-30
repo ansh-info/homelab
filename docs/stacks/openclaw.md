@@ -1,6 +1,6 @@
 # OpenClaw Stack
 
-This guide documents the OpenClaw deployment in the homelab, including the exact first-run bootstrap needed for the containerized gateway, the private NPM exposure model, Discord DM onboarding, OpenAI model auth, and the main failure modes discovered during the initial rollout.
+This guide documents the OpenClaw deployment in the homelab, including the exact first-run bootstrap needed for the containerized gateway, the private NPM exposure model, Discord DM onboarding, Discord server-channel allowlisting, OpenAI model auth, and the main failure modes discovered during the initial rollout.
 
 For the shared placeholder vocabulary used in this file, see [../VARIABLES.md](../VARIABLES.md).
 
@@ -19,6 +19,7 @@ The current working rollout includes:
 - the Gateway-served web UI
 - private HTTPS access through `${OPENCLAW_HOSTNAME}`
 - Discord direct-message integration
+- Discord server-channel integration for allowlisted guilds and users
 - OpenAI API-key model auth
 
 The current recommended working model is:
@@ -245,7 +246,7 @@ After approval, the browser should connect normally.
 
 ## Discord Setup
 
-OpenClaw Discord support in this homelab is currently DM-first.
+OpenClaw Discord support in this homelab is currently DM-first, with optional guild/server channel access layered on afterward.
 
 ### Discord application and bot
 
@@ -300,6 +301,79 @@ docker exec openclaw-gateway node dist/index.js pairing approve discord <CODE>
 ```
 
 After approval, Discord DMs should work normally.
+
+### Discord server workspace
+
+Discord server replies are separate from Discord DM setup.
+
+The current homelab config uses:
+
+- `channels.discord.groupPolicy = "allowlist"`
+- explicit guild allowlisting under `channels.discord.guilds`
+
+Without a guild entry, the bot can be healthy and DM-capable but still ignore all server messages, including `@mentions`.
+
+For a private server, the minimal working shape is:
+
+```json5
+{
+  channels: {
+    discord: {
+      groupPolicy: "allowlist",
+      guilds: {
+        YOUR_SERVER_ID: {
+          requireMention: true,
+          users: ["YOUR_USER_ID"],
+        },
+      },
+    },
+  },
+}
+```
+
+Because numeric Discord IDs are awkward to write as path segments with `config set`, the simplest live update is to replace the whole `channels.discord.guilds` object:
+
+```bash
+docker exec openclaw-gateway node dist/index.js config set channels.discord.guilds \
+  '{"YOUR_SERVER_ID":{"requireMention":true,"users":["YOUR_USER_ID"]}}' --strict-json
+docker restart openclaw-gateway
+```
+
+Working example used in this homelab:
+
+```bash
+docker exec openclaw-gateway node dist/index.js config set channels.discord.guilds \
+  '{"905804327724134471":{"requireMention":true,"users":["595840757907324943"]}}' --strict-json
+docker restart openclaw-gateway
+```
+
+Behavior notes:
+
+- `requireMention: true`
+  - the bot replies in the allowlisted server only when explicitly `@mentioned`
+- `requireMention: false`
+  - the bot can reply to normal messages from allowlisted users in that server
+  - this is only recommended for a private server
+- `users`
+  - this is the per-guild allowlist of Discord user IDs allowed to talk to the bot in that server
+
+### Additional Discord users
+
+Discord DM access and Discord server access are different:
+
+- DM access
+  - each person can DM the bot directly
+  - if DM policy remains pairing-based, each person must send one DM, receive a pairing code, and be approved
+- server access
+  - each person must also be included in the guild `users` allowlist if they should be able to talk to the bot inside the server
+
+Example with two allowed users in the same server:
+
+```bash
+docker exec openclaw-gateway node dist/index.js config set channels.discord.guilds \
+  '{"YOUR_SERVER_ID":{"requireMention":true,"users":["USER_ID_1","USER_ID_2"]}}' --strict-json
+docker restart openclaw-gateway
+```
 
 ## Model and Provider Setup
 
