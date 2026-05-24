@@ -48,6 +48,7 @@ CI runs `docker compose config` for every stack on all pushes. The immich stack 
 ## Stack Layout
 
 Seven compose stacks under `docker-compose/`:
+
 - `pihole` - DNS authority (port 53 on host)
 - `nginx-proxy-manager` - Reverse proxy (ports 80, 443 on host)
 - `jellyfin-arr-stack` - Media: Jellyfin (NVIDIA GPU), Radarr, Sonarr, Prowlarr, Bazarr, Homarr, qBittorrent, Seerr
@@ -85,3 +86,9 @@ curl -vk --resolve <service>.homelab.ansh-info.com:443:<TAILSCALE_IP> https://<s
 - Pi-hole v6 requires `FTLCONF_misc_etc_dnsmasq_d: "true"` to load `/etc/dnsmasq.d`
 - Nextcloud AIO container name `nextcloud-aio-mastercontainer` is immutable
 - Immich compose references `stack.env` via `env_file:` (not `.env`)
+
+## Further Context
+
+- `AGENTS.md` - detailed rules for service addition, storage layout, NPM config, and documentation updates
+- `docs/NETWORKING.md` - full networking model, Tailscale NAT keepalive fix, and failure diagnostics
+- `docs/OPERATIONS.md` - day-two operations, incident playbooks, and backup priorities
