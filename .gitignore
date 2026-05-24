@@ -195,3 +195,6 @@ cython_debug/
 
 # Local planning and note artifacts
 docs/superpowers/
+
+# Stack environment files (may contain secrets)
+docker-compose/**/stack.env
