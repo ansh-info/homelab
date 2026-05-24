@@ -477,6 +477,130 @@ When debugging, use this order:
 
 This sequence prevents guessing and keeps each failure isolated to a specific layer.
 
+## Tailscale Direct Connection and NAT Keepalive
+
+### Problem: DERP Relay Fallback
+
+Tailscale prefers direct peer-to-peer WireGuard connections between devices. When direct connections cannot be established or maintained, Tailscale falls back to DERP relay servers. DERP relays are bandwidth-limited and add latency, making streaming services like Jellyfin unusable.
+
+Symptoms of DERP fallback:
+
+- `tailscale ping homelab` shows `via DERP(blr)` instead of a direct IP
+- Jellyfin buffering even at low bitrates (1.5-3 Mbps)
+- Latency spikes of 700-1000ms instead of normal ~200ms for international links
+
+### Root Cause: Jio Router NAT Expiry
+
+The Jio Centrum router (192.168.29.1) aggressively expires UDP NAT mappings after 30-60 seconds of inactivity. When the mapping expires, Tailscale loses the direct path and falls back to DERP until it can re-establish a connection through NAT hole-punching.
+
+UPnP is enabled on the router but non-functional (`tailscale netcheck` reports empty PortMapping). The router admin password is not the default (`admin`/`Jiocentrum`) and cannot be reset remotely.
+
+### Current Fix: Systemd Keepalive Service
+
+A systemd service on the homelab pings all tailnet devices every 25 seconds, preventing the NAT mapping from expiring.
+
+Service file: `/etc/systemd/system/tailscale-keepalive.service`
+
+```ini
+[Unit]
+Description=Tailscale NAT keepalive
+After=tailscaled.service
+Wants=tailscaled.service
+
+[Service]
+Type=simple
+ExecStart=/bin/bash -c 'while true; do /usr/bin/tailscale ping --c 1 ansh-macbookpro-work >/dev/null 2>&1; /usr/bin/tailscale ping --c 1 ansh-macbookpro >/dev/null 2>&1; /usr/bin/tailscale ping --c 1 ansh-iphone16promax >/dev/null 2>&1; /usr/bin/tailscale ping --c 1 apoorva-macbook >/dev/null 2>&1; /usr/bin/tailscale ping --c 1 apoorva-oneplus >/dev/null 2>&1; sleep 25; done'
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
+```
+
+How it works:
+
+- Sends a Tailscale ping to each device every 25 seconds
+- Keeps the router NAT mapping alive by generating regular UDP traffic
+- Failed pings to offline devices are silently ignored
+- When a device comes online, the next ping cycle (within 25 seconds) establishes a direct path
+
+Management commands:
+
+```bash
+# Check status
+sudo systemctl status tailscale-keepalive
+
+# Restart after editing device list
+sudo systemctl daemon-reload
+sudo systemctl restart tailscale-keepalive
+
+# Add a new device: edit the service file ExecStart line, then restart
+```
+
+### Verification
+
+From a client device:
+
+```bash
+# Should show "via <IP>:41641" not "via DERP(...)"
+tailscale ping homelab
+
+# Bandwidth test (start iperf3 -s -B 100.123.147.108 on homelab first)
+iperf3 -c 100.123.147.108 -t 10
+```
+
+Expected results:
+
+- Direct connection: `via 49.43.x.x:41641 in ~200ms`
+- Bandwidth: ~20-30 Mbps (sufficient for 1080p streaming)
+
+### Permanent Fix: Port Forward (When Router Access is Available)
+
+The keepalive is a workaround. The permanent fix is a single port forward rule on the Jio router:
+
+- Protocol: UDP
+- External port: 41641
+- Internal IP: 192.168.29.133
+- Internal port: 41641
+
+This tells the router to always accept incoming Tailscale traffic - no keepalive needed.
+
+After adding the port forward:
+
+```bash
+sudo systemctl disable --now tailscale-keepalive
+sudo rm /etc/systemd/system/tailscale-keepalive.service
+sudo systemctl daemon-reload
+```
+
+Verify with `tailscale netcheck` on the homelab - PortMapping should show the forwarded port, and the external IPv4 should report `:41641` instead of a random port.
+
+### Tailscale Configuration on the Homelab
+
+Current settings:
+
+- Tailscale port: 41641 (set in `/etc/default/tailscaled`)
+- UFW allows UDP 41641 for Tailscale
+- Stateful filtering disabled (`NoStatefulFiltering: true`)
+- Exit node advertised (`AdvertiseRoutes: 0.0.0.0/0, ::/0`)
+- Accept DNS disabled (`CorpDNS: false`) to preserve host resolver
+
+### Diagnostic Commands (Run on Homelab)
+
+```bash
+# Check if Tailscale is using the correct port
+sudo ss -ulnp | grep 41641
+
+# Check NAT mapping and external IP
+tailscale netcheck 2>&1 | grep "IPv4\|PortMapping"
+
+# Check keepalive service
+sudo systemctl status tailscale-keepalive
+
+# Check direct connectivity to a specific peer
+tailscale ping ansh-macbookpro-work
+```
+
 ## Related Docs
 
 - [SETUP.md](SETUP.md)
