@@ -98,7 +98,6 @@ Start here for the detailed rebuild docs:
 ## Repository Layout
 
 - [docker-compose](docker-compose): Portainer stack definitions and service-specific compose files
-- [utils](utils): helper scripts
 - [docs](docs): rebuild and operations documentation
 
 ## Operating Model
