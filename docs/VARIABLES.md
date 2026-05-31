@@ -70,6 +70,14 @@ The placeholders are documentation variables only. They are not automatically ex
 | `${OPENCLAW_HOSTNAME}` | Private hostname for the OpenClaw gateway | `openclaw.homelab.ansh-info.com` |
 | `${OPENCLAW_GATEWAY_PORT}` | Internal Gateway port served by OpenClaw | `18789` |
 
+## Duplicati Variables
+
+| Variable | Meaning | Current Example |
+| --- | --- | --- |
+| `${DUPLICATI_CONFIG_ROOT}` | Host path for Duplicati configuration | `/mnt/ssd/docker-volumes/duplicati/config` |
+| `${DUPLICATI_HOSTNAME}` | Private hostname for Duplicati | `backup.homelab.ansh-info.com` |
+| `${BACKUP_ROOT}` | Mount point for backup destination HDD | `/mnt/backup` |
+
 ## Actual Budget Variables
 
 | Variable | Meaning | Current Example |
