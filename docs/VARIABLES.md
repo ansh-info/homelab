@@ -70,6 +70,13 @@ The placeholders are documentation variables only. They are not automatically ex
 | `${OPENCLAW_HOSTNAME}` | Private hostname for the OpenClaw gateway | `openclaw.homelab.ansh-info.com` |
 | `${OPENCLAW_GATEWAY_PORT}` | Internal Gateway port served by OpenClaw | `18789` |
 
+## Vaultwarden Variables
+
+| Variable | Meaning | Current Example |
+| --- | --- | --- |
+| `${VAULTWARDEN_DATA_ROOT}` | Host path for Vaultwarden persistent data | `/mnt/ssd/docker-volumes/vaultwarden/data` |
+| `${VAULTWARDEN_HOSTNAME}` | Private hostname for Vaultwarden | `vault.homelab.ansh-info.com` |
+
 ## Actual Budget Variables
 
 | Variable | Meaning | Current Example |
