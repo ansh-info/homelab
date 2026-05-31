@@ -88,7 +88,7 @@ services:
       - PGID=1000
       - TZ=Etc/UTC
     volumes:
-      - /mnt/ssd/docker-volumes/arr/librarr/config:/config
+      - /mnt/ssd/docker-volumes/arr/librarr/data:/data
       - /mnt/ssd/docker-volumes/arr/librarr/books:/books
       - /mnt/ssd/docker-volumes/arr/qbittorrent/downloads:/downloads
     # ports:
