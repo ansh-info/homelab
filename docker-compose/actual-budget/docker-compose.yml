@@ -1,0 +1,21 @@
+services:
+  actual-budget:
+    image: actualbudget/actual-server:latest-alpine
+    container_name: actual-budget
+    restart: unless-stopped
+    environment:
+      TZ: "Asia/Kolkata"
+    volumes:
+      - /mnt/ssd/docker-volumes/actual-budget/data:/data
+    networks:
+      - proxy
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://127.0.0.1:5006/"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+networks:
+  proxy:
+    external: true
