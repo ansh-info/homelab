@@ -93,6 +93,17 @@ jobs:
             db_database_name: placeholder
             pihole_password: placeholder
             tailscale_ip: 127.0.0.1
+          - name: vaultwarden
+            path: docker-compose/vaultwarden
+            gpu: false
+            host_mounts: true
+            upload_location: /tmp/uploads-unused
+            db_data_location: /tmp/db-unused
+            db_password: placeholder
+            db_username: placeholder
+            db_database_name: placeholder
+            pihole_password: placeholder
+            tailscale_ip: 127.0.0.1
           - name: watchtower
             path: docker-compose/watchtower
             gpu: false
