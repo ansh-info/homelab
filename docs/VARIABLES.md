@@ -81,7 +81,7 @@ The placeholders are documentation variables only. They are not automatically ex
 
 | Variable | Meaning | Current Example |
 | --- | --- | --- |
-| `${LIBRARR_CONFIG_ROOT}` | Host path for Librarr config | `/mnt/ssd/docker-volumes/arr/librarr/config` |
+| `${LIBRARR_DATA_ROOT}` | Host path for Librarr data (database and settings) | `/mnt/ssd/docker-volumes/arr/librarr/data` |
 | `${LIBRARR_BOOKS_ROOT}` | Host path for Librarr book library (shared with Kavita and Jellyfin) | `/mnt/ssd/docker-volumes/arr/librarr/books` |
 | `${KAVITA_CONFIG_ROOT}` | Host path for Kavita config | `/mnt/ssd/docker-volumes/arr/kavita/config` |
 | `${LIBRARR_HOSTNAME}` | Private hostname for Librarr | `librarr.homelab.ansh-info.com` |

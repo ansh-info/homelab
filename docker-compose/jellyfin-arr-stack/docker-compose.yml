@@ -92,7 +92,7 @@ services:
       - /mnt/ssd/docker-volumes/arr/librarr/books:/books
       - /mnt/ssd/docker-volumes/arr/qbittorrent/downloads:/downloads
     # ports:
-    #   - 8787:8787
+    #   - 5050:5050
     networks:
       - proxy
     restart: unless-stopped
