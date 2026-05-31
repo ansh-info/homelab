@@ -2,6 +2,42 @@
 
 <!-- version list -->
 
+## v1.2.0 (2026-05-31)
+
+### Continuous Integration
+
+- Add actual-budget to compose validation matrix
+  ([`ff0a8b0`](https://github.com/ansh-info/homelab/commit/ff0a8b0efd22a9e17d001b3de941074847a84667))
+
+### Documentation
+
+- Add actual-budget to README and docs index
+  ([`c97f864`](https://github.com/ansh-info/homelab/commit/c97f86491da7d632d175aee6ddd7622cae5426d6))
+
+- Add actual-budget variables to VARIABLES.md
+  ([`5bbb80f`](https://github.com/ansh-info/homelab/commit/5bbb80f849e03e768cbd38b14eb58609e2e19783))
+
+- Add CLAUDE.md for Claude Code guidance
+  ([`d3bca46`](https://github.com/ansh-info/homelab/commit/d3bca46d8537ffd4d1a38d32e69646c3b88f9d1a))
+
+- Add stack guide for actual-budget
+  ([`a601c05`](https://github.com/ansh-info/homelab/commit/a601c05023895fd448716209064dadb068a4bcbe))
+
+- Document Tailscale NAT keepalive fix for DERP relay fallback
+  ([`2efac4e`](https://github.com/ansh-info/homelab/commit/2efac4ea3a02367cbfab6d7bd45a5ba1ee3b4eaf))
+
+- Fix markdown lint and add cross-references to CLAUDE.md
+  ([`bb86cc6`](https://github.com/ansh-info/homelab/commit/bb86cc68794defd0e45f45db0566ea2317087257))
+
+- Update CLAUDE.md and AGENTS.md stack lists
+  ([`3516ea1`](https://github.com/ansh-info/homelab/commit/3516ea11fa730b59192be10c0666ebe474d5e768))
+
+### Features
+
+- Add actual-budget stack for personal finance management
+  ([`6d78267`](https://github.com/ansh-info/homelab/commit/6d78267dcbece379af48537b370f63c9a4f53dc7))
+
+
 ## v1.1.2 (2026-03-30)
 
 ### Bug Fixes
