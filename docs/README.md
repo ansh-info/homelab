@@ -29,6 +29,7 @@ Use the docs in this order for a full rebuild:
 - [stacks/immich.md](stacks/immich.md)
 - [stacks/nextcloud-aio.md](stacks/nextcloud-aio.md)
 - [stacks/openclaw.md](stacks/openclaw.md)
+- [stacks/actual-budget.md](stacks/actual-budget.md)
 - [stacks/watchtower.md](stacks/watchtower.md)
 
 ## Documentation Conventions

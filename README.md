@@ -56,6 +56,7 @@ The main service definitions live under [docker-compose](docker-compose):
 - [docker-compose/immich/docker-compose.yml](docker-compose/immich/docker-compose.yml)
 - [docker-compose/nextcloud-aio/docker-compose.yml](docker-compose/nextcloud-aio/docker-compose.yml)
 - [docker-compose/openclaw/docker-compose.yml](docker-compose/openclaw/docker-compose.yml)
+- [docker-compose/actual-budget/docker-compose.yml](docker-compose/actual-budget/docker-compose.yml)
 - [docker-compose/watchtower/docker-compose.yml](docker-compose/watchtower/docker-compose.yml)
 
 Additional repo content includes dotfiles, editor config, and utility scripts, but the homelab deployment path is centered on the compose files above.
@@ -93,6 +94,7 @@ Start here for the detailed rebuild docs:
 - [docs/stacks/immich.md](docs/stacks/immich.md)
 - [docs/stacks/nextcloud-aio.md](docs/stacks/nextcloud-aio.md)
 - [docs/stacks/openclaw.md](docs/stacks/openclaw.md)
+- [docs/stacks/actual-budget.md](docs/stacks/actual-budget.md)
 - [docs/stacks/watchtower.md](docs/stacks/watchtower.md)
 
 ## Repository Layout
