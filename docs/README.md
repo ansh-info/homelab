@@ -30,6 +30,7 @@ Use the docs in this order for a full rebuild:
 - [stacks/nextcloud-aio.md](stacks/nextcloud-aio.md)
 - [stacks/openclaw.md](stacks/openclaw.md)
 - [stacks/actual-budget.md](stacks/actual-budget.md)
+- [stacks/uptime-kuma.md](stacks/uptime-kuma.md)
 - [stacks/watchtower.md](stacks/watchtower.md)
 
 ## Documentation Conventions
