@@ -70,6 +70,13 @@ The placeholders are documentation variables only. They are not automatically ex
 | `${OPENCLAW_HOSTNAME}` | Private hostname for the OpenClaw gateway | `openclaw.homelab.ansh-info.com` |
 | `${OPENCLAW_GATEWAY_PORT}` | Internal Gateway port served by OpenClaw | `18789` |
 
+## Uptime Kuma Variables
+
+| Variable | Meaning | Current Example |
+| --- | --- | --- |
+| `${UPTIME_KUMA_DATA_ROOT}` | Host path for Uptime Kuma persistent data | `/mnt/ssd/docker-volumes/uptime-kuma/data` |
+| `${UPTIME_KUMA_HOSTNAME}` | Private hostname for Uptime Kuma | `status.homelab.ansh-info.com` |
+
 ## Actual Budget Variables
 
 | Variable | Meaning | Current Example |
