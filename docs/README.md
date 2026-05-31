@@ -30,6 +30,7 @@ Use the docs in this order for a full rebuild:
 - [stacks/nextcloud-aio.md](stacks/nextcloud-aio.md)
 - [stacks/openclaw.md](stacks/openclaw.md)
 - [stacks/actual-budget.md](stacks/actual-budget.md)
+- [stacks/vaultwarden.md](stacks/vaultwarden.md)
 - [stacks/watchtower.md](stacks/watchtower.md)
 
 ## Documentation Conventions
