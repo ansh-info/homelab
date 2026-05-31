@@ -52,7 +52,7 @@ The main service definitions live under [docker-compose](docker-compose):
 
 - [docker-compose/pihole/docker-compose.yml](docker-compose/pihole/docker-compose.yml)
 - [docker-compose/nginx-proxy-manager/docker-compose.yml](docker-compose/nginx-proxy-manager/docker-compose.yml)
-- [docker-compose/jellyfin-arr-stack/docker-compose.yml](docker-compose/jellyfin-arr-stack/docker-compose.yml)
+- [docker-compose/jellyfin-arr-stack/docker-compose.yml](docker-compose/jellyfin-arr-stack/docker-compose.yml) (includes Librarr + Kavita for books)
 - [docker-compose/immich/docker-compose.yml](docker-compose/immich/docker-compose.yml)
 - [docker-compose/nextcloud-aio/docker-compose.yml](docker-compose/nextcloud-aio/docker-compose.yml)
 - [docker-compose/openclaw/docker-compose.yml](docker-compose/openclaw/docker-compose.yml)

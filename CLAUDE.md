@@ -51,7 +51,7 @@ Eight compose stacks under `docker-compose/`:
 
 - `pihole` - DNS authority (port 53 on host)
 - `nginx-proxy-manager` - Reverse proxy (ports 80, 443 on host)
-- `jellyfin-arr-stack` - Media: Jellyfin (NVIDIA GPU), Radarr, Sonarr, Prowlarr, Bazarr, Homarr, qBittorrent, Seerr
+- `jellyfin-arr-stack` - Media: Jellyfin (NVIDIA GPU), Radarr, Sonarr, Prowlarr, Bazarr, Librarr, Kavita, Homarr, qBittorrent, Seerr
 - `immich` - Photo management (uses `stack.env` for config)
 - `nextcloud-aio` - Cloud storage (two NPM hosts: admin + app)
 - `openclaw` - AI assistant gateway (stateful, manual updates only)

@@ -80,20 +80,36 @@ services:
   #     - 8686:8686
   #   restart: unless-stopped
 
-  # readarr:
-  #   image: lscr.io/linuxserver/readarr:amd64-nightly-0.4.0.2593-ls334
-  #   container_name: readarr
-  #   environment:
-  #     - PUID=1000
-  #     - PGID=1000
-  #     - TZ=Etc/UTC
-  #   volumes:
-  #     - /mnt/ssd/docker-volumes/arr/readarr/config:/config
-  #     - /mnt/ssd/docker-volumes/arr/readarr/books:/data/books
-  #     - /mnt/ssd/docker-volumes/arr/qbittorrent/downloads:/downloads
-  #   ports:
-  #     - 8787:8787
-  #   restart: unless-stopped
+  librarr:
+    image: ghcr.io/jeremiahm37/librarr:latest
+    container_name: librarr
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+    volumes:
+      - /mnt/ssd/docker-volumes/arr/librarr/config:/config
+      - /mnt/ssd/docker-volumes/arr/librarr/books:/books
+      - /mnt/ssd/docker-volumes/arr/qbittorrent/downloads:/downloads
+    # ports:
+    #   - 8787:8787
+    networks:
+      - proxy
+    restart: unless-stopped
+
+  kavita:
+    image: jvmilazz0/kavita:latest
+    container_name: kavita
+    environment:
+      - TZ=Etc/UTC
+    volumes:
+      - /mnt/ssd/docker-volumes/arr/kavita/config:/kavita/config
+      - /mnt/ssd/docker-volumes/arr/librarr/books:/books
+    # ports:
+    #   - 5000:5000
+    networks:
+      - proxy
+    restart: unless-stopped
 
   homarr:
     image: ghcr.io/ajnart/homarr:latest
@@ -145,8 +161,8 @@ services:
       - /mnt/ssd/docker-volumes/arr/jellyfin/config:/config
       - /mnt/ssd/docker-volumes/arr/sonarr/tvseries:/data/tvshows
       - /mnt/ssd/docker-volumes/arr/radarr/movies:/data/movies
-      - /mnt/ssd/docker-volumes/arr/readarr/books:/data/books
-      - /mnt/ssd/docker-volumes/arr/lidarr/music:/data/music
+      - /mnt/ssd/docker-volumes/arr/librarr/books:/data/books
+      # - /mnt/ssd/docker-volumes/arr/lidarr/music:/data/music
     ports:
       # - 8096:8096
       - 8920:8920

@@ -77,6 +77,16 @@ The placeholders are documentation variables only. They are not automatically ex
 | `${ACTUAL_DATA_ROOT}` | Host path for Actual Budget persistent data | `/mnt/ssd/docker-volumes/actual-budget/data` |
 | `${ACTUAL_HOSTNAME}` | Private hostname for Actual Budget | `actual.homelab.ansh-info.com` |
 
+## Librarr and Kavita Variables
+
+| Variable | Meaning | Current Example |
+| --- | --- | --- |
+| `${LIBRARR_CONFIG_ROOT}` | Host path for Librarr config | `/mnt/ssd/docker-volumes/arr/librarr/config` |
+| `${LIBRARR_BOOKS_ROOT}` | Host path for Librarr book library (shared with Kavita and Jellyfin) | `/mnt/ssd/docker-volumes/arr/librarr/books` |
+| `${KAVITA_CONFIG_ROOT}` | Host path for Kavita config | `/mnt/ssd/docker-volumes/arr/kavita/config` |
+| `${LIBRARR_HOSTNAME}` | Private hostname for Librarr | `librarr.homelab.ansh-info.com` |
+| `${KAVITA_HOSTNAME}` | Private hostname for Kavita | `kavita.homelab.ansh-info.com` |
+
 ## Notes
 
 - When multiple docs mention the same variable, prefer using the definitions in this file rather than inventing a new variant.

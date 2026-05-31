@@ -22,18 +22,20 @@ The current compose file includes:
 - `bazarr`
 - `qbittorrent`
 - `homarr`
+- `librarr` (book/ebook automation - Readarr replacement)
+- `kavita` (ebook reader and library server)
 
 Currently commented out in the checked-in compose file:
 
 - `lidarr`
 - `plex`
-- `readarr`
 
 These services do not all play the same role:
 
 - `jellyfin` and `plex` serve media
+- `kavita` serves ebooks/comics with a web reader
 - `seerr` is the request UI
-- `radarr`, `sonarr`, `bazarr`, and `prowlarr` coordinate discovery and metadata
+- `radarr`, `sonarr`, `bazarr`, `librarr`, and `prowlarr` coordinate discovery and metadata
 - `qbittorrent` handles downloads
 - `homarr` is a dashboard layer
 
@@ -105,6 +107,14 @@ Current important service details from the compose file:
   - internal web UI port `8080`
   - torrent port `6881` exposed on host
   - attached to `${PROXY_NETWORK}`
+- `librarr`
+  - internal port `8787`
+  - attached to `${PROXY_NETWORK}`
+  - intended to be reverse-proxied
+- `kavita`
+  - internal port `5000`
+  - attached to `${PROXY_NETWORK}`
+  - intended to be reverse-proxied
 - `homarr`
   - currently present but not attached to `${PROXY_NETWORK}` in the compose file
 - `lidarr`
@@ -128,6 +138,9 @@ Examples from the current compose file:
 - `${CONFIG_ROOT}/qbittorrent/downloads`
 - `${CONFIG_ROOT}/radarr/movies`
 - `${CONFIG_ROOT}/sonarr/tvseries`
+- `${CONFIG_ROOT}/librarr/config`
+- `${CONFIG_ROOT}/librarr/books`
+- `${CONFIG_ROOT}/kavita/config`
 - `${CONFIG_ROOT}/homarr/config`
 - `${CONFIG_ROOT}/homarr/icons`
 - `${CONFIG_ROOT}/homarr/data`
@@ -144,6 +157,9 @@ Current migrated host layout:
 - `/mnt/ssd/docker-volumes/arr/qbittorrent/downloads`
 - `/mnt/ssd/docker-volumes/arr/jellyfin/config`
 - `/mnt/ssd/docker-volumes/arr/seerr/config`
+- `/mnt/ssd/docker-volumes/arr/librarr/config`
+- `/mnt/ssd/docker-volumes/arr/librarr/books`
+- `/mnt/ssd/docker-volumes/arr/kavita/config`
 - `/mnt/ssd/docker-volumes/arr/homarr/config`
 - `/mnt/ssd/docker-volumes/arr/homarr/icons`
 - `/mnt/ssd/docker-volumes/arr/homarr/data`
@@ -206,6 +222,8 @@ Expected reverse-proxy targets include:
 - `prowlarr.${DOMAIN_ROOT}` -> `prowlarr:9696`
 - `bazarr.${DOMAIN_ROOT}` -> `bazarr:6767`
 - `jellyfin.${DOMAIN_ROOT}` -> `jellyfin:8096`
+- `librarr.${DOMAIN_ROOT}` -> `librarr:8787`
+- `kavita.${DOMAIN_ROOT}` -> `kavita:5000`
 
 Current exceptions in the compose file:
 
@@ -294,6 +312,8 @@ Look especially for:
 - `sonarr`
 - `prowlarr`
 - `bazarr`
+- `librarr`
+- `kavita`
 - `jellyfin`
 - `qbittorrent`
 - `homarr`
@@ -304,7 +324,7 @@ Look especially for:
 docker network inspect ${PROXY_NETWORK}
 ```
 
-For normal NPM access, services like `seerr`, `radarr`, `sonarr`, `prowlarr`, `bazarr`, `jellyfin`, and `qbittorrent` should appear on `${PROXY_NETWORK}`.
+For normal NPM access, services like `seerr`, `radarr`, `sonarr`, `prowlarr`, `bazarr`, `librarr`, `kavita`, `jellyfin`, and `qbittorrent` should appear on `${PROXY_NETWORK}`.
 
 Do not assume `homarr` will appear there unless the compose file is changed. `lidarr` and `plex` are currently commented out.
 
@@ -377,6 +397,8 @@ Typical targets for this stack:
 - `prowlarr.${DOMAIN_ROOT}` -> `prowlarr:9696`
 - `bazarr.${DOMAIN_ROOT}` -> `bazarr:6767`
 - `jellyfin.${DOMAIN_ROOT}` -> `jellyfin:8096`
+- `librarr.${DOMAIN_ROOT}` -> `librarr:8787`
+- `kavita.${DOMAIN_ROOT}` -> `kavita:5000`
 
 ### How To Fill NPM For These Services
 
@@ -390,6 +412,8 @@ For the active services in this stack, the practical NPM pattern is:
 | `prowlarr.${DOMAIN_ROOT}` | `http` | `prowlarr` | `9696` |
 | `bazarr.${DOMAIN_ROOT}` | `http` | `bazarr` | `6767` |
 | `jellyfin.${DOMAIN_ROOT}` | `http` | `jellyfin` | `8096` |
+| `librarr.${DOMAIN_ROOT}` | `http` | `librarr` | `8787` |
+| `kavita.${DOMAIN_ROOT}` | `http` | `kavita` | `5000` |
 
 Recommended NPM toggles for these entries:
 
