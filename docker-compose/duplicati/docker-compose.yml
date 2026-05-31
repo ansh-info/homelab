@@ -1,0 +1,25 @@
+services:
+  duplicati:
+    image: linuxserver/duplicati:latest
+    container_name: duplicati
+    restart: unless-stopped
+    environment:
+      TZ: "Asia/Kolkata"
+      PUID: "0"
+      PGID: "0"
+    volumes:
+      - /mnt/ssd/docker-volumes/duplicati/config:/config
+      - /mnt/backup:/backups
+      - /mnt/ssd/docker-volumes:/source:ro
+    networks:
+      - proxy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://127.0.0.1:8200/"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+
+networks:
+  proxy:
+    external: true
