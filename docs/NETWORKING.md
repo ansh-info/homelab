@@ -601,6 +601,101 @@ sudo systemctl status tailscale-keepalive
 tailscale ping ansh-macbookpro-work
 ```
 
+## TCP Performance Tuning (BBR Congestion Control)
+
+### Problem: TCP Stalls Despite Direct Connection
+
+After solving the DERP relay problem with the keepalive service, Jellyfin streaming still buffered. The direct WireGuard path was established, but TCP throughput was unstable - bursting to 37 Mbps then dropping to 0 Mbps for 2-3 seconds repeatedly.
+
+Symptoms:
+
+- iperf3 TCP tests show thousands of retransmissions per 10-second run
+- bandwidth oscillates wildly (0-37 Mbps) instead of holding steady
+- Jellyfin buffers despite the connection being direct (not DERP)
+- UDP tests at the same target bitrate show near-zero packet loss
+
+### Root Cause: Cubic Congestion Control on a High-Latency Path
+
+The default Linux TCP congestion algorithm (cubic) ramps the send rate until packets drop. On the ~200ms Europe-India path through the Jio router's shallow buffers:
+
+1. Cubic increases the congestion window aggressively
+2. The Jio router buffer overflows, dropping packets
+3. Cubic detects loss and collapses the window to near-zero
+4. The connection stalls for 2-3 seconds
+5. Cubic ramps up again, overshoots again - repeat
+
+This produces a sawtooth bandwidth pattern that makes streaming unwatchable, even though the underlying path can sustain 20+ Mbps (proven by UDP tests).
+
+### Fix: BBR Congestion Control
+
+BBR (Bottleneck Bandwidth and Round-trip propagation time) models the path capacity rather than probing until loss. It maintains a steady send rate that fills the pipe without overflowing buffers.
+
+Current configuration on the homelab:
+
+```text
+/etc/modules-load.d/bbr.conf:
+tcp_bbr
+
+/etc/sysctl.d/99-bbr.conf:
+net.ipv4.tcp_congestion_control=bbr
+net.core.default_qdisc=fq
+```
+
+### Performance Comparison
+
+| Metric | Before (cubic) | After (BBR) |
+|--------|---------------|-------------|
+| Average throughput (homelab to client) | 8 Mbps | 25 Mbps |
+| Lowest interval in 10s test | 0 Mbps (multiple) | 21 Mbps |
+| Multi-second stalls | Yes | None |
+| Retransmissions per 10s | ~2,400 | ~3,400 (but no stalls) |
+
+BBR still causes retransmissions (the router buffer is shallow), but unlike cubic it does not collapse the send rate when loss is detected. The result is stable, usable throughput.
+
+### Verification
+
+```bash
+# Confirm BBR is active
+sysctl net.ipv4.tcp_congestion_control
+
+# Expected output:
+# net.ipv4.tcp_congestion_control = bbr
+
+# TCP bandwidth test (homelab sends, client receives)
+# On homelab:
+iperf3 -s -B 100.123.147.108
+# On client:
+iperf3 -c 100.123.147.108 -t 10 -R
+
+# Expected: stable 20-25 Mbps with no 0 Mbps intervals
+```
+
+### Relationship to Keepalive Service
+
+Both components are required:
+
+- The keepalive service maintains a direct WireGuard path (prevents DERP relay fallback)
+- BBR ensures the direct path delivers stable throughput for streaming
+
+Without the keepalive, the connection falls back to DERP (~1-3 Mbps). Without BBR, the direct connection has unusable stalls. Neither alone is sufficient.
+
+### Recovery
+
+If BBR causes issues, revert to cubic immediately:
+
+```bash
+sudo sysctl -w net.ipv4.tcp_congestion_control=cubic
+sudo sysctl -w net.core.default_qdisc=pfifo_fast
+```
+
+To make the revert permanent:
+
+```bash
+sudo rm /etc/sysctl.d/99-bbr.conf
+sudo rm /etc/modules-load.d/bbr.conf
+sudo sysctl -p
+```
+
 ## Related Docs
 
 - [SETUP.md](SETUP.md)
