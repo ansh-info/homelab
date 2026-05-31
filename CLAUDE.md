@@ -47,7 +47,7 @@ CI runs `docker compose config` for every stack on all pushes. The immich stack 
 
 ## Stack Layout
 
-Seven compose stacks under `docker-compose/`:
+Eight compose stacks under `docker-compose/`:
 
 - `pihole` - DNS authority (port 53 on host)
 - `nginx-proxy-manager` - Reverse proxy (ports 80, 443 on host)
@@ -55,6 +55,7 @@ Seven compose stacks under `docker-compose/`:
 - `immich` - Photo management (uses `stack.env` for config)
 - `nextcloud-aio` - Cloud storage (two NPM hosts: admin + app)
 - `openclaw` - AI assistant gateway (stateful, manual updates only)
+- `actual-budget` - Personal finance and envelope budgeting
 - `watchtower` - Auto-updates for other containers
 
 ## Dotfiles

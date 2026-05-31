@@ -59,6 +59,7 @@ Current stack layout:
 - `docker-compose/immich`
 - `docker-compose/nextcloud-aio`
 - `docker-compose/openclaw`
+- `docker-compose/actual-budget`
 - `docker-compose/watchtower`
 
 If a new stack is added, place it under:
