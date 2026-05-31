@@ -90,6 +90,9 @@ services:
     dns:
       - 1.1.1.1
       - 8.8.8.8
+    extra_hosts:
+      - "annas-archive.gl:127.0.0.1"
+      - "libgen.li:127.0.0.1"
     volumes:
       - /mnt/ssd/docker-volumes/arr/librarr/data:/data
       - /mnt/ssd/docker-volumes/arr/librarr/books:/books
