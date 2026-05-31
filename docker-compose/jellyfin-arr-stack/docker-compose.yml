@@ -87,6 +87,9 @@ services:
       - PUID=1000
       - PGID=1000
       - TZ=Etc/UTC
+    dns:
+      - 1.1.1.1
+      - 8.8.8.8
     volumes:
       - /mnt/ssd/docker-volumes/arr/librarr/data:/data
       - /mnt/ssd/docker-volumes/arr/librarr/books:/books
