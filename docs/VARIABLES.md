@@ -70,6 +70,13 @@ The placeholders are documentation variables only. They are not automatically ex
 | `${OPENCLAW_HOSTNAME}` | Private hostname for the OpenClaw gateway | `openclaw.homelab.ansh-info.com` |
 | `${OPENCLAW_GATEWAY_PORT}` | Internal Gateway port served by OpenClaw | `18789` |
 
+## Actual Budget Variables
+
+| Variable | Meaning | Current Example |
+| --- | --- | --- |
+| `${ACTUAL_DATA_ROOT}` | Host path for Actual Budget persistent data | `/mnt/ssd/docker-volumes/actual-budget/data` |
+| `${ACTUAL_HOSTNAME}` | Private hostname for Actual Budget | `actual.homelab.ansh-info.com` |
+
 ## Notes
 
 - When multiple docs mention the same variable, prefer using the definitions in this file rather than inventing a new variant.
