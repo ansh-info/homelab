@@ -2,6 +2,25 @@
 
 <!-- version list -->
 
+## v1.2.1 (2026-06-01)
+
+### Bug Fixes
+
+- Gitignore stack.env files to prevent secret leaks
+  ([`0593b19`](https://github.com/ansh-info/homelab/commit/0593b1923df65f6b477996acc2b2fa41a2162567))
+
+- Harden jellyfin-arr-stack security and logging
+  ([`7ebc830`](https://github.com/ansh-info/homelab/commit/7ebc8302d776e80f08e54b666ca84e627597a5f9))
+
+- Restrict Watchtower docker.sock to read-only and remove debug mode
+  ([`580e501`](https://github.com/ansh-info/homelab/commit/580e501ba6429ba24e70be2eae76254eeb014473))
+
+### Documentation
+
+- Update all docs to reflect security hardening changes
+  ([`1a7b01d`](https://github.com/ansh-info/homelab/commit/1a7b01d6c4bfff8eadb380fbd1639f274623ea78))
+
+
 ## v1.2.0 (2026-05-31)
 
 ### Continuous Integration
