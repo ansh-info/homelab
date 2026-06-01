@@ -66,7 +66,7 @@ If a new stack is added, place it under:
 
 - `docker-compose/<stack-name>/docker-compose.yml`
 
-If the stack needs an env file, keep it in the same folder.
+If the stack needs an env file, keep it in the same folder. Note that `stack.env` files are gitignored to prevent accidental secret commits - they must be created manually on fresh clones.
 
 ## Deployment Model
 
@@ -354,6 +354,12 @@ That includes:
 - `NVIDIA_DRIVER_CAPABILITIES=compute,video,utility`
 
 Agents should not remove or rewrite this casually.
+
+### Watchtower
+
+- Docker socket is mounted read-only (`:ro`) as a deliberate security constraint
+- Do not add `--debug` to the command unless actively troubleshooting
+- Do not change the socket mount to read-write without explicit user approval
 
 ## Source Docs
 

@@ -106,7 +106,7 @@ Current important service details from the compose file:
   - torrent port `6881` exposed on host
   - attached to `${PROXY_NETWORK}`
 - `homarr`
-  - currently present but not attached to `${PROXY_NETWORK}` in the compose file
+  - dashboard layer attached to `${PROXY_NETWORK}`
 - `lidarr`
   - currently commented out in the checked-in compose file
 - `plex`
@@ -210,8 +210,8 @@ Expected reverse-proxy targets include:
 Current exceptions in the compose file:
 
 - `qbittorrent` publishes `6881/tcp` and `6881/udp`
-- `jellyfin` publishes `8920`, `7359/udp`, and `1900/udp`
-- `homarr` is present but has no host ports and is not attached to `${PROXY_NETWORK}`
+- `jellyfin` publishes `8920` (discovery ports `7359/udp` and `1900/udp` are disabled)
+- `homarr` has no host ports but is attached to `${PROXY_NETWORK}`
 - `lidarr` and `plex` are currently commented out
 
 These direct exposures are stack-specific exceptions, not the primary ingress pattern.
@@ -304,9 +304,9 @@ Look especially for:
 docker network inspect ${PROXY_NETWORK}
 ```
 
-For normal NPM access, services like `seerr`, `radarr`, `sonarr`, `prowlarr`, `bazarr`, `jellyfin`, and `qbittorrent` should appear on `${PROXY_NETWORK}`.
+For normal NPM access, services like `seerr`, `radarr`, `sonarr`, `prowlarr`, `bazarr`, `jellyfin`, `qbittorrent`, and `homarr` should appear on `${PROXY_NETWORK}`.
 
-Do not assume `homarr` will appear there unless the compose file is changed. `lidarr` and `plex` are currently commented out.
+`lidarr` and `plex` are currently commented out.
 
 ### Confirm Seerr health
 
@@ -390,6 +390,7 @@ For the active services in this stack, the practical NPM pattern is:
 | `prowlarr.${DOMAIN_ROOT}` | `http` | `prowlarr` | `9696` |
 | `bazarr.${DOMAIN_ROOT}` | `http` | `bazarr` | `6767` |
 | `jellyfin.${DOMAIN_ROOT}` | `http` | `jellyfin` | `8096` |
+| `homarr.${DOMAIN_ROOT}` | `http` | `homarr` | `7575` |
 
 Recommended NPM toggles for these entries:
 
@@ -403,12 +404,11 @@ Recommended NPM toggles for these entries:
 - `HSTS Enabled`: enabled
 - `HSTS Sub-domains`: enabled
 
-Optional entries only if those services are enabled and attached to `${PROXY_NETWORK}`:
+Optional entries (only if those services are enabled and attached to `${PROXY_NETWORK}`):
 
 | Public hostname | Scheme | Forward Hostname / IP | Forward Port |
 | --- | --- | --- | --- |
 | `lidarr.${DOMAIN_ROOT}` | `http` | `lidarr` | `8686` |
-| `homarr.${DOMAIN_ROOT}` | `http` | `homarr` | `7575` |
 | `plex.${DOMAIN_ROOT}` | `http` | `plex` | `32400` |
 
 Before adding an NPM entry for a service, confirm that:
@@ -473,7 +473,6 @@ Likely causes:
 
 Current examples from the compose file:
 
-- `homarr` is present but does not currently join `${PROXY_NETWORK}`
 - `lidarr` is currently commented out
 - `plex` is currently commented out
 
