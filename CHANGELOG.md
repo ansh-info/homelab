@@ -2,6 +2,14 @@
 
 <!-- version list -->
 
+## v1.4.0 (2026-06-05)
+
+### Documentation
+
+- Add BBR congestion control tuning for Jellyfin streaming
+  ([`2bee9e0`](https://github.com/ansh-info/homelab/commit/2bee9e047175860fd52a6e51df5fb63e8d1868da))
+
+
 ## v1.3.0 (2026-06-02)
 
 ### Continuous Integration
