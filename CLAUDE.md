@@ -47,7 +47,7 @@ CI runs `docker compose config` for every stack on all pushes. The immich stack 
 
 ## Stack Layout
 
-Nine compose stacks under `docker-compose/`:
+Ten compose stacks under `docker-compose/`:
 
 - `pihole` - DNS authority (port 53 on host)
 - `nginx-proxy-manager` - Reverse proxy (ports 80, 443 on host)
@@ -57,6 +57,7 @@ Nine compose stacks under `docker-compose/`:
 - `openclaw` - AI assistant gateway (stateful, manual updates only)
 - `actual-budget` - Personal finance and envelope budgeting
 - `uptime-kuma` - Service uptime monitoring and alerting
+- `vaultwarden` - Self-hosted Bitwarden password manager
 - `watchtower` - Auto-updates for other containers
 
 ## Dotfiles
