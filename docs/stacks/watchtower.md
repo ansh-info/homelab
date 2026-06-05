@@ -17,7 +17,7 @@ Watchtower monitors Docker containers and updates eligible images automatically.
 Watchtower depends on:
 
 - Docker and Portainer
-- access to `/var/run/docker.sock`
+- read-only access to `/var/run/docker.sock` (mounted with `:ro`)
 - acceptance that Watchtower can evaluate any running container visible through the Docker socket
 
 ## Placeholder Variables
@@ -39,17 +39,15 @@ ${TZ}=Asia/Kolkata
 Current important details from the stack:
 
 - image: `containrrr/watchtower`
-- Docker socket mounted from the host
+- Docker socket mounted read-only from the host
 - interval set to `86400` seconds
 - `--cleanup` enabled
-- `--debug` enabled
 
 Meaning:
 
 - updates are not limited to labeled containers by the checked-in compose file
 - Watchtower can evaluate and update running containers beyond the stacks defined in this repo
 - old images are cleaned up after updates
-- logs are verbose enough for debugging
 
 ## Portainer Deployment
 

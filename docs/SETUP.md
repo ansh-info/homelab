@@ -436,7 +436,35 @@ Verify:
 sudo ufw status verbose
 ```
 
-## 7. Create the Shared Docker Network
+## 7. Enable BBR Congestion Control
+
+BBR is required for stable streaming throughput over high-latency Tailscale paths. Without it, TCP cubic causes multi-second stalls on international links.
+
+```bash
+# Load the BBR kernel module
+sudo modprobe tcp_bbr
+
+# Persist module loading at boot
+echo 'tcp_bbr' | sudo tee /etc/modules-load.d/bbr.conf
+
+# Enable BBR and fair queueing
+sudo sysctl -w net.ipv4.tcp_congestion_control=bbr
+sudo sysctl -w net.core.default_qdisc=fq
+
+# Persist sysctl settings
+echo -e 'net.ipv4.tcp_congestion_control=bbr\nnet.core.default_qdisc=fq' | sudo tee /etc/sysctl.d/99-bbr.conf
+```
+
+Verify:
+
+```bash
+sysctl net.ipv4.tcp_congestion_control
+# Expected: net.ipv4.tcp_congestion_control = bbr
+```
+
+See [NETWORKING.md - TCP Performance Tuning](NETWORKING.md#tcp-performance-tuning-bbr-congestion-control) for full context on why this is needed.
+
+## 8. Create the Shared Docker Network
 
 Reverse-proxied services are expected to join a shared external Docker network named `proxy`.
 
@@ -453,7 +481,7 @@ docker network ls
 docker network inspect proxy
 ```
 
-## 8. Prepare Persistent Stack Paths
+## 9. Prepare Persistent Stack Paths
 
 Before importing stacks into Portainer, ensure the host paths referenced by the compose files exist.
 
@@ -467,7 +495,7 @@ At minimum, this homelab currently expects paths for:
 
 Do not wait until after stack deployment to create core directories. Missing host paths make troubleshooting much harder and can create permission drift.
 
-## 9. Pre-Deploy Verification Checklist
+## 10. Pre-Deploy Verification Checklist
 
 Before deploying the first stack, verify all platform prerequisites:
 

@@ -1,0 +1,23 @@
+services:
+  vaultwarden:
+    image: vaultwarden/server:latest
+    container_name: vaultwarden
+    restart: unless-stopped
+    environment:
+      TZ: "Asia/Kolkata"
+      DOMAIN: "https://vault.homelab.ansh-info.com"
+      SIGNUPS_ALLOWED: "false"
+    volumes:
+      - /mnt/ssd/docker-volumes/vaultwarden/data:/data
+    networks:
+      - proxy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://127.0.0.1:80/alive"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+networks:
+  proxy:
+    external: true

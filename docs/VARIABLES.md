@@ -78,6 +78,21 @@ The placeholders are documentation variables only. They are not automatically ex
 | `${DUPLICATI_HOSTNAME}` | Private hostname for Duplicati | `backup.homelab.ansh-info.com` |
 | `${BACKUP_ROOT}` | Mount point for backup destination HDD | `/mnt/backup` |
 
+## Uptime Kuma Variables
+
+| Variable | Meaning | Current Example |
+| --- | --- | --- |
+| `${UPTIME_KUMA_DATA_ROOT}` | Host path for Uptime Kuma persistent data | `/mnt/ssd/docker-volumes/uptime-kuma/data` |
+| `${UPTIME_KUMA_HOSTNAME}` | Private hostname for Uptime Kuma | `status.homelab.ansh-info.com` |
+
+## Vaultwarden Variables
+
+| Variable | Meaning | Current Example |
+| --- | --- | --- |
+| `${VAULTWARDEN_DATA_ROOT}` | Host path for Vaultwarden persistent data | `/mnt/ssd/docker-volumes/vaultwarden/data` |
+| `${VAULTWARDEN_HOSTNAME}` | Private hostname for Vaultwarden | `vault.homelab.ansh-info.com` |
+>>>>>>> origin/main
+
 ## Actual Budget Variables
 
 | Variable | Meaning | Current Example |

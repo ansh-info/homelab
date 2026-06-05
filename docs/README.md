@@ -31,6 +31,8 @@ Use the docs in this order for a full rebuild:
 - [stacks/openclaw.md](stacks/openclaw.md)
 - [stacks/actual-budget.md](stacks/actual-budget.md)
 - [stacks/duplicati.md](stacks/duplicati.md)
+- [stacks/uptime-kuma.md](stacks/uptime-kuma.md)
+- [stacks/vaultwarden.md](stacks/vaultwarden.md)
 - [stacks/watchtower.md](stacks/watchtower.md)
 
 ## Documentation Conventions

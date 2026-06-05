@@ -58,6 +58,8 @@ The main service definitions live under [docker-compose](docker-compose):
 - [docker-compose/openclaw/docker-compose.yml](docker-compose/openclaw/docker-compose.yml)
 - [docker-compose/actual-budget/docker-compose.yml](docker-compose/actual-budget/docker-compose.yml)
 - [docker-compose/duplicati/docker-compose.yml](docker-compose/duplicati/docker-compose.yml)
+- [docker-compose/uptime-kuma/docker-compose.yml](docker-compose/uptime-kuma/docker-compose.yml)
+- [docker-compose/vaultwarden/docker-compose.yml](docker-compose/vaultwarden/docker-compose.yml)
 - [docker-compose/watchtower/docker-compose.yml](docker-compose/watchtower/docker-compose.yml)
 
 Additional repo content includes dotfiles, editor config, and utility scripts, but the homelab deployment path is centered on the compose files above.
@@ -97,12 +99,13 @@ Start here for the detailed rebuild docs:
 - [docs/stacks/openclaw.md](docs/stacks/openclaw.md)
 - [docs/stacks/actual-budget.md](docs/stacks/actual-budget.md)
 - [docs/stacks/duplicati.md](docs/stacks/duplicati.md)
+- [docs/stacks/uptime-kuma.md](docs/stacks/uptime-kuma.md)
+- [docs/stacks/vaultwarden.md](docs/stacks/vaultwarden.md)
 - [docs/stacks/watchtower.md](docs/stacks/watchtower.md)
 
 ## Repository Layout
 
 - [docker-compose](docker-compose): Portainer stack definitions and service-specific compose files
-- [utils](utils): helper scripts
 - [docs](docs): rebuild and operations documentation
 
 ## Operating Model

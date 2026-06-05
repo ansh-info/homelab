@@ -2,6 +2,60 @@
 
 <!-- version list -->
 
+## v1.4.0 (2026-06-05)
+
+### Documentation
+
+- Add BBR congestion control tuning for Jellyfin streaming
+  ([`2bee9e0`](https://github.com/ansh-info/homelab/commit/2bee9e047175860fd52a6e51df5fb63e8d1868da))
+
+
+## v1.3.0 (2026-06-02)
+
+### Continuous Integration
+
+- Add uptime-kuma to compose validation matrix
+  ([`2ce1a09`](https://github.com/ansh-info/homelab/commit/2ce1a091b7e3e980ad408fb1ae074db1860ef7ca))
+
+### Documentation
+
+- Add stack guide for uptime-kuma
+  ([`a237aa4`](https://github.com/ansh-info/homelab/commit/a237aa4c31653e4ca63a860793ae32ac954701e4))
+
+- Add uptime-kuma to README and docs index
+  ([`369fbbb`](https://github.com/ansh-info/homelab/commit/369fbbb29e6451590dccced550dde4316417dcdc))
+
+- Add uptime-kuma variables to VARIABLES.md
+  ([`22fcd1b`](https://github.com/ansh-info/homelab/commit/22fcd1b1039287228e416c244b73a72433203c15))
+
+- Update CLAUDE.md and AGENTS.md stack lists for uptime-kuma
+  ([`6b41055`](https://github.com/ansh-info/homelab/commit/6b4105505acb6305ee324382383475b4d853b93a))
+
+### Features
+
+- Add uptime-kuma stack for service monitoring
+  ([`cca3302`](https://github.com/ansh-info/homelab/commit/cca33021ca8ac6b4f6cf77c020a30d198ce0cd17))
+
+
+## v1.2.1 (2026-06-01)
+
+### Bug Fixes
+
+- Gitignore stack.env files to prevent secret leaks
+  ([`0593b19`](https://github.com/ansh-info/homelab/commit/0593b1923df65f6b477996acc2b2fa41a2162567))
+
+- Harden jellyfin-arr-stack security and logging
+  ([`7ebc830`](https://github.com/ansh-info/homelab/commit/7ebc8302d776e80f08e54b666ca84e627597a5f9))
+
+- Restrict Watchtower docker.sock to read-only and remove debug mode
+  ([`580e501`](https://github.com/ansh-info/homelab/commit/580e501ba6429ba24e70be2eae76254eeb014473))
+
+### Documentation
+
+- Update all docs to reflect security hardening changes
+  ([`1a7b01d`](https://github.com/ansh-info/homelab/commit/1a7b01d6c4bfff8eadb380fbd1639f274623ea78))
+
+
 ## v1.2.0 (2026-05-31)
 
 ### Continuous Integration
