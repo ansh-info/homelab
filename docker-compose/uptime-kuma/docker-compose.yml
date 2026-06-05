@@ -1,0 +1,21 @@
+services:
+  uptime-kuma:
+    image: louislam/uptime-kuma:2
+    container_name: uptime-kuma
+    restart: unless-stopped
+    environment:
+      TZ: "Asia/Kolkata"
+    volumes:
+      - /mnt/ssd/docker-volumes/uptime-kuma/data:/app/data
+    networks:
+      - proxy
+    healthcheck:
+      test: ["CMD", "extra/healthcheck"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+
+networks:
+  proxy:
+    external: true

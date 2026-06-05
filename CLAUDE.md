@@ -34,7 +34,7 @@ docker compose -f docker-compose/<stack>/docker-compose.yml config
 python3 -c "import tomllib, pathlib; tomllib.load(pathlib.Path('aerospace/aerospace.toml').open('rb'))"
 ```
 
-CI runs `docker compose config` for every stack on all pushes. The immich stack requires its `stack.env` file in the same directory.
+CI runs `docker compose config` for every stack on all pushes. The immich stack requires its `stack.env` file in the same directory (gitignored - must be created manually on fresh clones).
 
 ## Key Conventions
 
@@ -47,7 +47,7 @@ CI runs `docker compose config` for every stack on all pushes. The immich stack 
 
 ## Stack Layout
 
-Nine compose stacks under `docker-compose/`:
+Ten compose stacks under `docker-compose/`:
 
 - `pihole` - DNS authority (port 53 on host)
 - `nginx-proxy-manager` - Reverse proxy (ports 80, 443 on host)
@@ -56,6 +56,7 @@ Nine compose stacks under `docker-compose/`:
 - `nextcloud-aio` - Cloud storage (two NPM hosts: admin + app)
 - `openclaw` - AI assistant gateway (stateful, manual updates only)
 - `actual-budget` - Personal finance and envelope budgeting
+- `uptime-kuma` - Service uptime monitoring and alerting
 - `vaultwarden` - Self-hosted Bitwarden password manager
 - `watchtower` - Auto-updates for other containers
 
@@ -88,6 +89,7 @@ curl -vk --resolve <service>.homelab.ansh-info.com:443:<TAILSCALE_IP> https://<s
 - Pi-hole v6 requires `FTLCONF_misc_etc_dnsmasq_d: "true"` to load `/etc/dnsmasq.d`
 - Nextcloud AIO container name `nextcloud-aio-mastercontainer` is immutable
 - Immich compose references `stack.env` via `env_file:` (not `.env`)
+- Watchtower docker.sock is mounted read-only (`:ro`) - do not change to read-write
 
 ## Further Context
 
