@@ -1,3 +1,26 @@
+# =============================================================================
+# Vaultwarden - Self-Hosted Password Manager (Bitwarden-compatible)
+# =============================================================================
+# Lightweight Bitwarden-compatible server for password management. Works with
+# all official Bitwarden clients (browser extensions, mobile apps, desktop).
+#
+# Access: vault.homelab.ansh-info.com (reverse-proxied through NPM)
+# Internal port: 80
+# No host ports exposed - NPM handles all ingress via the proxy network.
+#
+# Security notes:
+#   - SIGNUPS_ALLOWED is set to "false" after initial user creation
+#   - DOMAIN must match the actual access URL for WebSocket notifications
+#   - All vault data is encrypted client-side before reaching the server
+#
+# Initial setup:
+#   1. Deploy with SIGNUPS_ALLOWED: "true"
+#   2. Create your account via the web UI
+#   3. Redeploy with SIGNUPS_ALLOWED: "false" to lock registration
+#
+# Backup priority: CRITICAL - contains encrypted password vault.
+# =============================================================================
+
 services:
   vaultwarden:
     image: vaultwarden/server:latest
@@ -5,9 +28,12 @@ services:
     restart: unless-stopped
     environment:
       TZ: "Asia/Kolkata"
+      # Must match the public URL used to access the vault (enables WebSocket notifications)
       DOMAIN: "https://vault.homelab.ansh-info.com"
+      # Disable public registration after first user is created
       SIGNUPS_ALLOWED: "false"
     volumes:
+      # Encrypted vault data, attachments, RSA keys, and SQLite database
       - /mnt/ssd/docker-volumes/vaultwarden/data:/data
     networks:
       - proxy

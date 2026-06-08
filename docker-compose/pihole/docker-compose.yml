@@ -1,3 +1,24 @@
+# =============================================================================
+# Pi-hole - Internal DNS Authority
+# =============================================================================
+# Pi-hole serves as the DNS resolver for all homelab services. It answers
+# queries for *.homelab.ansh-info.com with the Tailscale IP of this host,
+# enabling hostname-based routing through Nginx Proxy Manager.
+#
+# Key behavior:
+#   - Wildcard DNS via dnsmasq: address=/.homelab.ansh-info.com/100.123.147.108
+#   - New services resolve immediately without adding individual records
+#   - Also provides ad-blocking for all tailnet clients
+#
+# Access: pihole.homelab.ansh-info.com (reverse-proxied through NPM)
+# Internal port: 80 (web UI), 53 (DNS)
+# Host port: 53 (TCP/UDP) - required for DNS to function
+#
+# CRITICAL: Pi-hole v6 requires FTLCONF_misc_etc_dnsmasq_d: "true" to load
+# custom dnsmasq configs from /etc/dnsmasq.d. Without it, the wildcard rule
+# file can exist on disk but will be silently ignored.
+# =============================================================================
+
 # More info at https://github.com/pi-hole/docker-pi-hole/ and https://docs.pi-hole.net/
 services:
   pihole:
@@ -15,6 +36,9 @@ services:
       #- "67:67/udp"
       # Uncomment the line below if you are using Pi-hole as your NTP server
       #- "123:123/udp"
+
+      # Bound to 0.0.0.0 (not the Tailscale IP) to avoid boot race condition.
+      # UFW restricts access to tailscale0 interface only.
       - "53:53/tcp"
       - "53:53/udp"
 
@@ -32,12 +56,14 @@ services:
       # If using Docker's default `bridge` network setting the dns listening mode should be set to 'all'
       FTLCONF_dns_listeningMode: "all"
       PIHOLE_HOSTNAME: pihole
+      # CRITICAL: Without this, /etc/dnsmasq.d files (including the wildcard rule) are ignored
       FTLCONF_misc_etc_dnsmasq_d: "true"
     # Volumes store your data between container upgrades
     volumes:
       # For persisting Pi-hole's databases and common configuration file
       # - "./etc-pihole:/etc/pihole"
       - "/mnt/ssd/docker-volumes/pihole/etc-pihole:/etc/pihole"
+      # Custom dnsmasq configs (contains 99-homelab.conf with the wildcard DNS rule)
       - "/mnt/ssd/docker-volumes/pihole/etc-dnsmasq.d:/etc/dnsmasq.d"
       # Uncomment the below if you have custom dnsmasq config files that you want to persist. Not needed for most starting fresh with Pi-hole v6. If you're upgrading from v5 you and have used this directory before, you should keep it enabled for the first v6 container start to allow for a complete migration. It can be removed afterwards. Needs environment variable FTLCONF_misc_etc_dnsmasq_d: 'true'
       #- './etc-dnsmasq.d:/etc/dnsmasq.d'

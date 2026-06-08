@@ -1,3 +1,17 @@
+# =============================================================================
+# Actual Budget - Personal Finance and Envelope Budgeting
+# =============================================================================
+# Self-hosted budgeting application using the envelope method. Provides
+# transaction tracking, budget categories, and financial reporting.
+#
+# Access: budget.homelab.ansh-info.com (reverse-proxied through NPM)
+# Internal port: 5006
+# No host ports exposed - NPM handles all ingress via the proxy network.
+#
+# Data: All budget data, accounts, and transactions stored in /data volume.
+# Backup priority: HIGH - contains financial records with no external sync.
+# =============================================================================
+
 services:
   actual-budget:
     image: actualbudget/actual-server:latest-alpine
@@ -6,6 +20,7 @@ services:
     environment:
       TZ: "Asia/Kolkata"
     volumes:
+      # Budget database, account files, and user data
       - /mnt/ssd/docker-volumes/actual-budget/data:/data
     networks:
       - proxy

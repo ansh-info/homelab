@@ -1,21 +1,67 @@
+# =============================================================================
+# Jellyfin + Arr Stack - Media Automation and Streaming
+# =============================================================================
+# Complete media automation pipeline from request to streaming. Users request
+# content through Seerr, which triggers the download-import-stream workflow.
+#
+# Data flow:
+#   Seerr (request) --> Radarr/Sonarr (manage) --> Prowlarr (search indexers)
+#   --> qBittorrent (download) --> Radarr/Sonarr (import to library)
+#   --> Jellyfin (stream) + Bazarr (fetch subtitles)
+#
+# Architecture:
+#   Seerr:        User-facing request portal ("what do you want to watch?")
+#   Radarr:       Movie library manager (monitors, grabs, imports)
+#   Sonarr:       TV series library manager (same role as Radarr for shows)
+#   Prowlarr:     Indexer aggregator (single config point for all indexers)
+#   qBittorrent:  BitTorrent download client
+#   Bazarr:       Subtitle companion (fetches .srt files for media)
+#   Jellyfin:     Media streaming server with NVIDIA GPU hardware transcoding
+#   Homarr:       Dashboard showing stack status at a glance
+#
+# Networking: All services join the "proxy" network for NPM reverse proxying.
+#   No web UI ports are exposed to the host - NPM handles ingress for each
+#   service via its own hostname (e.g., radarr.homelab.ansh-info.com).
+#   Exception: qBittorrent exposes port 6881 for BitTorrent peer connections.
+#
+# Storage strategy: All services share paths under /mnt/ssd/docker-volumes/arr/
+#   so that hardlinks work for imports (no file copying, instant moves).
+#   The /downloads path is shared between qBittorrent and Radarr/Sonarr.
+# =============================================================================
+
 services:
+  # ---------------------------------------------------------------------------
+  # Radarr - Movie Library Manager
+  # Monitors wanted movies, searches via Prowlarr, sends to qBittorrent,
+  # and imports completed downloads into the movie library.
+  # Access: radarr.homelab.ansh-info.com | Internal port: 7878
+  # ---------------------------------------------------------------------------
   radarr:
     image: lscr.io/linuxserver/radarr:latest
     container_name: radarr
     environment:
+      # PUID/PGID match host user for consistent file ownership across shared volumes
       - PUID=1000
       - PGID=1000
       - TZ=Etc/UTC
     volumes:
       - /mnt/ssd/docker-volumes/arr/radarr/config:/config
       - /mnt/ssd/docker-volumes/arr/radarr/movies:/data/movies
+      # Shared with qBittorrent - enables hardlink imports (no copy, instant move)
       - /mnt/ssd/docker-volumes/arr/qbittorrent/downloads:/downloads
+    # Port not exposed to host - accessed via NPM reverse proxy
     # ports:
     #   - 7878:7878
     networks:
       - proxy
     restart: unless-stopped
 
+  # ---------------------------------------------------------------------------
+  # Sonarr - TV Series Library Manager
+  # Same role as Radarr but for TV shows. Monitors series, grabs episodes,
+  # and manages the TV library with season/episode organization.
+  # Access: sonarr.homelab.ansh-info.com | Internal port: 8989
+  # ---------------------------------------------------------------------------
   sonarr:
     image: lscr.io/linuxserver/sonarr:latest
     container_name: sonarr
@@ -26,6 +72,7 @@ services:
     volumes:
       - /mnt/ssd/docker-volumes/arr/sonarr/config:/config
       - /mnt/ssd/docker-volumes/arr/sonarr/tvseries:/data/tvshows
+      # Shared with qBittorrent - enables hardlink imports
       - /mnt/ssd/docker-volumes/arr/qbittorrent/downloads:/downloads
     # ports:
     #   - 8989:8989
@@ -33,6 +80,12 @@ services:
       - proxy
     restart: unless-stopped
 
+  # ---------------------------------------------------------------------------
+  # Prowlarr - Indexer Aggregator
+  # Single configuration point for torrent/usenet indexers. Radarr and Sonarr
+  # connect to Prowlarr instead of managing indexers individually.
+  # Access: prowlarr.homelab.ansh-info.com | Internal port: 9696
+  # ---------------------------------------------------------------------------
   prowlarr:
     image: lscr.io/linuxserver/prowlarr:latest
     container_name: prowlarr
@@ -48,6 +101,12 @@ services:
       - proxy
     restart: unless-stopped
 
+  # ---------------------------------------------------------------------------
+  # Bazarr - Subtitle Manager
+  # Companion to Radarr/Sonarr that automatically fetches subtitles for media.
+  # Mounts the same movie/TV paths so it can write .srt files alongside media.
+  # Access: bazarr.homelab.ansh-info.com | Internal port: 6767
+  # ---------------------------------------------------------------------------
   bazarr:
     image: lscr.io/linuxserver/bazarr:latest
     container_name: bazarr
@@ -57,7 +116,9 @@ services:
       - TZ=Etc/UTC
     volumes:
       - /mnt/ssd/docker-volumes/arr/bazarr/config:/config
+      # Mounts Radarr's movie library to write subtitle files alongside media
       - /mnt/ssd/docker-volumes/arr/radarr/movies:/data/movies
+      # Mounts Sonarr's TV library for the same reason
       - /mnt/ssd/docker-volumes/arr/sonarr/tvseries:/data/tvshows
     # ports:
     #   - 6767:6767
@@ -95,6 +156,12 @@ services:
   #     - 8787:8787
   #   restart: unless-stopped
 
+  # ---------------------------------------------------------------------------
+  # Homarr - Dashboard
+  # At-a-glance overview of all arr stack services. Shows status, quick links,
+  # and integration widgets for each service.
+  # Access: homarr.homelab.ansh-info.com | Internal port: 7575
+  # ---------------------------------------------------------------------------
   homarr:
     image: ghcr.io/ajnart/homarr:latest
     container_name: homarr
@@ -110,6 +177,13 @@ services:
     networks:
       - proxy
 
+  # ---------------------------------------------------------------------------
+  # qBittorrent - BitTorrent Download Client
+  # Downloads media files requested by Radarr/Sonarr. The /downloads volume
+  # is shared with Radarr and Sonarr so they can hardlink files into the
+  # library without copying (instant, zero extra disk space).
+  # Access: qbit.homelab.ansh-info.com | Internal WebUI port: 8080
+  # ---------------------------------------------------------------------------
   qbittorrent:
     image: lscr.io/linuxserver/qbittorrent:latest
     container_name: qbittorrent
@@ -124,12 +198,25 @@ services:
       - /mnt/ssd/docker-volumes/arr/qbittorrent/downloads:/downloads
     ports:
       # - 8080:8080
+      # BitTorrent peer connection port - must be exposed for incoming connections
       - 6881:6881
       - 6881:6881/udp
     networks:
       - proxy
     restart: unless-stopped
 
+  # ---------------------------------------------------------------------------
+  # Jellyfin - Media Streaming Server
+  # Streams movies, TV shows, music, and books to all devices. Uses NVIDIA GPU
+  # for hardware transcoding (converting video formats/bitrates on the fly).
+  # Access: jellyfin.homelab.ansh-info.com | Internal port: 8096
+  #
+  # NVIDIA GPU: runtime: nvidia enables GPU passthrough for hardware transcoding.
+  #   NVIDIA_VISIBLE_DEVICES=all makes all GPUs available to the container.
+  #   NVIDIA_DRIVER_CAPABILITIES=compute,video,utility enables NVENC/NVDEC.
+  #   DO NOT remove these - streaming without GPU transcoding will fail for
+  #   clients that don't support the source format directly.
+  # ---------------------------------------------------------------------------
   jellyfin:
     image: lscr.io/linuxserver/jellyfin:latest
     container_name: jellyfin
@@ -143,6 +230,7 @@ services:
       - NVIDIA_DRIVER_CAPABILITIES=compute,video,utility
     volumes:
       - /mnt/ssd/docker-volumes/arr/jellyfin/config:/config
+      # Read-only access to all media libraries managed by the arr services
       - /mnt/ssd/docker-volumes/arr/sonarr/tvseries:/data/tvshows
       - /mnt/ssd/docker-volumes/arr/radarr/movies:/data/movies
       - /mnt/ssd/docker-volumes/arr/readarr/books:/data/books
@@ -156,9 +244,17 @@ services:
       - proxy
     restart: unless-stopped
 
+  # ---------------------------------------------------------------------------
+  # Seerr - Media Request Management
+  # User-facing portal where users request movies/shows. Integrates with
+  # Radarr and Sonarr to automatically add requested content to their queues.
+  # This is the "front door" to the entire media automation pipeline.
+  # Access: seerr.homelab.ansh-info.com | Internal port: 5055
+  # ---------------------------------------------------------------------------
   seerr:
     image: ghcr.io/seerr-team/seerr:latest
     container_name: seerr
+    # init: true ensures proper signal handling for the Node.js process
     init: true
     environment:
       - LOG_LEVEL=info
@@ -217,6 +313,9 @@ services:
   #             device_ids: ["0"]
   #   restart: unless-stopped
 
+# External network shared with NPM and all other reverse-proxied services.
+# All services join this so NPM can route by hostname without host port exposure.
+# Must be pre-created: docker network create proxy
 networks:
   proxy:
     external: true

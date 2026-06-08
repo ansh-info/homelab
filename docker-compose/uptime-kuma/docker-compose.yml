@@ -1,3 +1,20 @@
+# =============================================================================
+# Uptime Kuma - Service Uptime Monitoring and Alerting
+# =============================================================================
+# Monitors all homelab services for availability. Sends notifications when
+# services go down and provides a status page showing uptime history.
+#
+# Access: status.homelab.ansh-info.com (reverse-proxied through NPM)
+# Internal port: 3001
+# No host ports exposed - NPM handles all ingress via the proxy network.
+#
+# NPM IMPORTANT: Enable "WebSocket Support" in the proxy host settings.
+#   Uptime Kuma uses WebSockets for real-time dashboard updates.
+#   Without this toggle, the UI will fail to load or show stale data.
+#
+# Data: Monitor configs, notification settings, and uptime history in /app/data.
+# =============================================================================
+
 services:
   uptime-kuma:
     image: louislam/uptime-kuma:2
@@ -6,6 +23,7 @@ services:
     environment:
       TZ: "Asia/Kolkata"
     volumes:
+      # Monitor definitions, notification configs, and historical uptime data
       - /mnt/ssd/docker-volumes/uptime-kuma/data:/app/data
     networks:
       - proxy

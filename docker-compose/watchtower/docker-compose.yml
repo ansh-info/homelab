@@ -1,3 +1,26 @@
+# =============================================================================
+# Watchtower - Automatic Container Image Updates
+# =============================================================================
+# Monitors running containers and automatically pulls new images when available.
+# Runs a check every 24 hours and cleans up old images after updating.
+#
+# Access: No web UI - runs as a background daemon.
+# No network needed - communicates only via the Docker socket.
+#
+# Behavior:
+#   - Checks all running containers every 86400 seconds (24 hours)
+#   - Pulls new images and recreates containers with same config
+#   - --cleanup removes old images after successful update
+#   - Docker socket mounted read-only (:ro) for safety
+#
+# WARNING: Watchtower updates ALL containers indiscriminately. For stateful
+#   services that require careful migration (like OpenClaw), consider using
+#   label-based exclusion: com.centurylinklabs.watchtower.enable=false
+#
+# IMPORTANT: Do NOT change the docker.sock mount to read-write. Read-only
+#   is sufficient for pulling images and recreating containers.
+# =============================================================================
+
 services:
   watchtower:
     container_name: watchtower
@@ -5,8 +28,10 @@ services:
     restart: unless-stopped
     environment:
       - TZ=Asia/Kolkata
+      # Pin Docker API version for compatibility
       - DOCKER_API_VERSION=1.40
     volumes:
+      # Docker socket for inspecting and recreating containers (read-only)
       - /var/run/docker.sock:/var/run/docker.sock:ro
     command:
       - --interval
