@@ -1,16 +1,49 @@
+# =============================================================================
+# OpenClaw - AI Assistant Gateway
+# =============================================================================
+# Centralized AI assistant gateway providing access to LLM-powered tools.
+# Stateful service that maintains sessions, context, and workspace artifacts.
+#
+# Access: openclaw.homelab.ansh-info.com (reverse-proxied through NPM)
+# Internal port: 18789
+# No host ports exposed - NPM handles all ingress via the proxy network.
+#
+# IMPORTANT - Manual updates only:
+#   This service is stateful with persistent sessions and context. Do NOT add
+#   to Watchtower auto-update. Unplanned restarts or image pulls can break
+#   active sessions and lose in-progress work. Update manually when idle.
+#
+# Environment variables:
+#   Required: OPENCLAW_GATEWAY_TOKEN (set in stack.env or Portainer env)
+#   Optional: OPENAI_API_KEY, DISCORD_BOT_TOKEN
+#
+# First deployment requires bootstrap setup - see docs/stacks/openclaw.md
+# =============================================================================
+
 services:
   openclaw-gateway:
     image: ghcr.io/openclaw/openclaw:latest
     container_name: openclaw-gateway
     restart: unless-stopped
+    # init: true wraps the Node.js process with tini for proper signal handling.
+    # Without it, SIGTERM is not forwarded correctly and graceful shutdown fails.
     init: true
     environment:
+      # HOME must match volume mount so OpenClaw finds config at $HOME/.openclaw
       HOME: /home/node
+      # Enable color output in container logs
       TERM: xterm-256color
       TZ: "${OPENCLAW_TZ:-Asia/Kolkata}"
+      # Gateway auth token - the :? syntax fails startup immediately if unset,
+      # preventing an unauthenticated gateway from running on the network
       OPENCLAW_GATEWAY_TOKEN: "${OPENCLAW_GATEWAY_TOKEN:?OPENCLAW_GATEWAY_TOKEN is required}"
+      # Optional LLM provider credentials
       OPENAI_API_KEY: "${OPENAI_API_KEY:-}"
+      # Optional Discord bot integration for chat-based access
       DISCORD_BOT_TOKEN: "${DISCORD_BOT_TOKEN:-}"
+    # Gateway command:
+    #   --bind lan: listen on all interfaces (0.0.0.0) so Docker network can reach it
+    #   --port 18789: HTTP port that NPM forwards HTTPS traffic to
     command:
       [
         "node",
@@ -22,10 +55,13 @@ services:
         "18789",
       ]
     volumes:
+      # Config: settings, credentials, session state, internal databases
       - /mnt/ssd/docker-volumes/openclaw/config:/home/node/.openclaw
+      # Workspace: persistent working directory for file operations and artifacts
       - /mnt/ssd/docker-volumes/openclaw/workspace:/home/node/.openclaw/workspace
     networks:
       - proxy
+    # Healthcheck hits the gateway's /healthz endpoint (HTTP 200 when ready)
     healthcheck:
       test:
         [
@@ -37,6 +73,7 @@ services:
       interval: 30s
       timeout: 5s
       retries: 5
+      # Grace period for Node.js gateway initialization
       start_period: 20s
 
 networks:
