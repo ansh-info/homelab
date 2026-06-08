@@ -1,3 +1,31 @@
+# =============================================================================
+# Nginx Proxy Manager - Reverse Proxy and TLS Termination
+# =============================================================================
+# NPM is the single ingress point for all homelab web services. It listens on
+# ports 80 and 443 on the host and routes traffic to backend containers based
+# on the requested hostname (SNI + Host header).
+#
+# How it works:
+#   1. Client connects to https://service.homelab.ansh-info.com
+#   2. NPM reads the SNI hostname from the TLS ClientHello
+#   3. Selects the wildcard certificate (*.homelab.ansh-info.com)
+#   4. Matches the hostname to a proxy host definition in its database
+#   5. Forwards to the target container:port on the Docker "proxy" network
+#
+# TLS certificates:
+#   - Wildcard cert: *.homelab.ansh-info.com (Let's Encrypt)
+#   - Issued via Cloudflare DNS challenge (no public HTTP endpoint needed)
+#   - Stored in /etc/letsencrypt volume
+#
+# Access: The admin UI (port 81) is NOT exposed to host. Access it via
+#   a proxy host entry pointing to nginx-proxy-manager:81, or temporarily
+#   expose port 81 for initial setup.
+#
+# IMPORTANT: Ports bind to 0.0.0.0 (not the Tailscale IP directly) to avoid
+#   a boot-time race condition where Docker starts before tailscale0 exists.
+#   UFW restricts actual access to the tailscale0 interface.
+# =============================================================================
+
 services:
   app:
     image: "jc21/nginx-proxy-manager:latest"
@@ -28,7 +56,9 @@ services:
       # DISABLE_IPV6: 'true'
 
     volumes:
+      # NPM configuration, proxy host definitions, and SQLite database
       - /mnt/ssd/docker-volumes/nginx-proxy-manager/data:/data
+      # SSL certificates from Let's Encrypt (wildcard cert for *.homelab.ansh-info.com)
       - /mnt/ssd/docker-volumes/nginx-proxy-manager/letsencrypt:/etc/letsencrypt
 
 networks:
