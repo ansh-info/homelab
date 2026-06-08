@@ -2,6 +2,14 @@
 
 <!-- version list -->
 
+## v1.5.0 (2026-06-08)
+
+### Features
+
+- Ascii readme update for architecture
+  ([`86a3996`](https://github.com/ansh-info/homelab/commit/86a39966a8683c30fc54f4e7160d13ad7796f5c7))
+
+
 ## v1.4.0 (2026-06-05)
 
 ### Documentation
