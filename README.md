@@ -29,22 +29,162 @@ The core request flow is:
 4. Nginx Proxy Manager reads the hostname and forwards traffic to the correct container on the shared `proxy` network.
 5. The target service responds from its internal container port.
 
-```mermaid
-flowchart LR
-    Client[Tailscale Client] --> DNS[Pi-hole DNS]
-    DNS -->|*.homelab.ansh-info.com -> Tailscale IP| Host[homelab host]
-    Host --> NPM[Nginx Proxy Manager]
-    NPM --> ProxyNet[Docker proxy network]
-    ProxyNet --> Apps[App containers]
+```
+                         HOMELAB NETWORK ARCHITECTURE
+===============================================================================
+
+  TAILSCALE CLIENTS (on private WireGuard mesh)
+  +------------------+  +------------------+  +------------------+
+  | MacBook (Work)   |  | MacBook (Personal)|  | iPhone 16 Pro   |
+  | macOS            |  | macOS             |  | iOS              |
+  +--------+---------+  +--------+----------+  +--------+---------+
+           |                     |                      |
+           +---------------------+----------------------+
+                                 |
+                    WireGuard UDP:41641
+                    (NAT keepalive: 25s ping cycle)
+                                 |
+===============================================================================
+                                 v
+  HOMELAB HOST (Linux, NVIDIA GPU)
+  LAN IP: 192.168.29.133 | Tailscale IP: 100.123.147.108
+  TCP Congestion: BBR (stable streaming over high-latency path)
++-----------------------------------------------------------------------------+
+|                                                                             |
+|  TAILSCALE INTERFACE (tailscale0)                                           |
+|  IP: 100.123.147.108 | Port: UDP 41641                                     |
+|                                                                             |
+|  +-----------------------------------------------------------------------+  |
+|  |  UFW FIREWALL (restrict inbound to tailscale0 only)                   |  |
+|  |                                                                       |  |
+|  |  ALLOW: TCP/UDP 53 on tailscale0  -->  Pi-hole (DNS)                  |  |
+|  |  ALLOW: TCP 80    on tailscale0  -->  Nginx Proxy Manager (HTTP)      |  |
+|  |  ALLOW: TCP 443   on tailscale0  -->  Nginx Proxy Manager (HTTPS)     |  |
+|  |  DENY:  all other inbound                                             |  |
+|  +-----------------------------------------------------------------------+  |
+|                                 |                                            |
+|                                 v                                            |
+|  +-----------------------------------------------------------------------+  |
+|  |  HOST PORT BINDINGS (bound to 0.0.0.0 to avoid boot race condition)  |  |
+|  |                                                                       |  |
+|  |  0.0.0.0:53  --> pihole container (DNS)                               |  |
+|  |  0.0.0.0:80  --> nginx-proxy-manager container (HTTP)                 |  |
+|  |  0.0.0.0:443 --> nginx-proxy-manager container (HTTPS/TLS)            |  |
+|  +-----------------------------------------------------------------------+  |
+|                                 |                                            |
+|                                 v                                            |
+|  +-----------------------------------------------------------------------+  |
+|  |               DOCKER EXTERNAL NETWORK: "proxy"                        |  |
+|  |               (all reverse-proxied services join this network)        |  |
+|  |               Docker embedded DNS: 127.0.0.11:53                      |  |
+|  |                                                                       |  |
+|  |  +---------------------------+    +-------------------------------+   |  |
+|  |  |        PI-HOLE            |    |    NGINX PROXY MANAGER        |   |  |
+|  |  |  container: pihole        |    |  container: nginx-proxy-mgr   |   |  |
+|  |  |  port: 53 (TCP/UDP)       |    |  port: 80 (HTTP), 443 (TLS)  |   |  |
+|  |  |                           |    |                               |   |  |
+|  |  |  Wildcard DNS rule:       |    |  TLS termination (SNI-based) |   |  |
+|  |  |  *.homelab.ansh-info.com  |    |  Let's Encrypt wildcard cert |   |  |
+|  |  |  --> 100.123.147.108      |    |  Cloudflare DNS challenge    |   |  |
+|  |  +---------------------------+    +-------+-----+---------+-------+   |  |
+|  |                                           |     |         |           |  |
+|  |              NPM PROXY HOST ROUTING       |     |         |           |  |
+|  |              (hostname --> container:port) |     |         |           |  |
+|  |  +----------------------------------------+-----+---------+--------+  |  |
+|  |  |                                                                 |  |  |
+|  |  |  seerr.homelab.ansh-info.com        --> seerr:5055              |  |  |
+|  |  |  jellyfin.homelab.ansh-info.com     --> jellyfin:8096           |  |  |
+|  |  |  immich.homelab.ansh-info.com       --> immich_server:2283      |  |  |
+|  |  |  radarr.homelab.ansh-info.com       --> radarr:7878             |  |  |
+|  |  |  sonarr.homelab.ansh-info.com       --> sonarr:8989             |  |  |
+|  |  |  prowlarr.homelab.ansh-info.com     --> prowlarr:9696           |  |  |
+|  |  |  bazarr.homelab.ansh-info.com       --> bazarr:6767             |  |  |
+|  |  |  qbit.homelab.ansh-info.com         --> qbittorrent:8080        |  |  |
+|  |  |  homarr.homelab.ansh-info.com       --> homarr:7575             |  |  |
+|  |  |  openclaw.homelab.ansh-info.com     --> openclaw-gateway:18789  |  |  |
+|  |  |  nextcloud.homelab.ansh-info.com    --> localhost:11000          |  |  |
+|  |  |  budget.homelab.ansh-info.com       --> actual-budget:5006      |  |  |
+|  |  |  status.homelab.ansh-info.com       --> uptime-kuma:3001        |  |  |
+|  |  |  vault.homelab.ansh-info.com        --> vaultwarden:80          |  |  |
+|  |  |  portainer.homelab.ansh-info.com    --> portainer:9000          |  |  |
+|  |  |  pihole.homelab.ansh-info.com       --> pihole:80               |  |  |
+|  |  |                                                                 |  |  |
+|  |  +-----------------------------------------------------------------+  |  |
+|  |                                                                       |  |
+|  |  +-- MEDIA STACK -------+  +-- PHOTO STACK ------+  +-- CLOUD -----+ |  |
+|  |  | jellyfin  (GPU/8096) |  | immich_server (2283)|  | nextcloud-aio| |  |
+|  |  | radarr        (7878) |  | immich_ml     (ML)  |  | (11000)      | |  |
+|  |  | sonarr        (8989) |  | immich_redis        |  +--------------+ |  |
+|  |  | prowlarr      (9696) |  | immich_postgres     |                    |  |
+|  |  | bazarr        (6767) |  +---------------------+  +-- AI --------+ |  |
+|  |  | qbittorrent   (8080) |                           | openclaw     | |  |
+|  |  | seerr         (5055) |  +-- UTILITIES ---------+ | (18789)      | |  |
+|  |  | homarr        (7575) |  | actual-budget (5006) | +--------------+ |  |
+|  |  +-----------------------+  | uptime-kuma  (3001) |                   |  |
+|  |                             | vaultwarden  (80)   |  +-- OPS ------+ |  |
+|  |                             | portainer    (9000) |  | watchtower  | |  |
+|  |                             +---------------------+  | (no port)   | |  |
+|  |                                                      +--------------+ |  |
+|  +-----------------------------------------------------------------------+  |
+|                                                                             |
+|  PERSISTENT STORAGE: /mnt/ssd/docker-volumes/                               |
+|  +-----------------------------------------------------------------------+  |
+|  |  pihole/          nginx-proxy-manager/   arr/                         |  |
+|  |  immich/          nextcloud/             openclaw/                     |  |
+|  |  actual-budget/   uptime-kuma/           vaultwarden/                  |  |
+|  +-----------------------------------------------------------------------+  |
++-----------------------------------------------------------------------------+
+
+===============================================================================
+                         DNS RESOLUTION CHAIN
+===============================================================================
+
+  Client browser requests: https://seerr.homelab.ansh-info.com
+                                     |
+                                     v
+  1. Tailscale Split DNS (admin console config)
+     Domain: homelab.ansh-info.com --> Nameserver: 100.123.147.108
+                                     |
+                                     v
+  2. Pi-hole (UDP/TCP 53)
+     dnsmasq rule: address=/.homelab.ansh-info.com/100.123.147.108
+     Response: seerr.homelab.ansh-info.com --> 100.123.147.108
+                                     |
+                                     v
+  3. Client connects to 100.123.147.108:443 with SNI hostname
+                                     |
+                                     v
+  4. NPM terminates TLS (wildcard cert: *.homelab.ansh-info.com)
+     Matches proxy host --> forwards to seerr:5055 on Docker network
+                                     |
+                                     v
+  5. Seerr responds --> NPM re-encrypts --> Client receives page
+
+===============================================================================
+                         EXTERNAL DEPENDENCIES
+===============================================================================
+
+  Cloudflare (ansh-info.com)           Tailscale Admin Console
+  - Domain registrar                   - Split DNS config
+  - DNS challenge for Let's Encrypt    - ACL policies
+  - NOT the private DNS authority      - Device management
+
+  Jio Router (192.168.29.1)            NVIDIA GPU (on host)
+  - NAT gateway to internet            - Jellyfin HW transcoding
+  - Aggressive UDP expiry (30-60s)     - Nextcloud media processing
+  - Keepalive service compensates
 ```
 
 Core platform components:
 
-- `Tailscale` for private network access
-- `Pi-hole` for internal DNS and wildcard local records
-- `Nginx Proxy Manager` for hostname-based routing and TLS
+- `Tailscale` for private network access (WireGuard mesh, Split DNS routing)
+- `Pi-hole` for internal DNS authority (wildcard dnsmasq rule)
+- `Nginx Proxy Manager` for hostname-based TLS routing (SNI + Let's Encrypt)
 - `Docker` plus `Portainer` for stack deployment and operations
-- Shared external Docker network `proxy` for reverse-proxied services
+- Shared external Docker network `proxy` for all reverse-proxied services
+- `UFW` firewall restricting inbound to `tailscale0` interface only
+- `BBR` congestion control for stable streaming over high-latency path
+- `Systemd keepalive` service preventing NAT expiry on Jio router
 
 ## Current Stack Layout
 
@@ -103,8 +243,32 @@ Start here for the detailed rebuild docs:
 
 ## Repository Layout
 
-- [docker-compose](docker-compose): Portainer stack definitions and service-specific compose files
-- [docs](docs): rebuild and operations documentation
+```
+homelab/
+├── docker-compose/                  # Portainer stack definitions
+│   ├── pihole/                      # DNS authority (port 53)
+│   ├── nginx-proxy-manager/         # Reverse proxy (ports 80, 443)
+│   ├── jellyfin-arr-stack/          # Media: Jellyfin + Radarr/Sonarr/Prowlarr/Bazarr/qBit/Seerr/Homarr
+│   ├── immich/                      # Photo management (server + ML + Redis + Postgres)
+│   ├── nextcloud-aio/               # Cloud storage (AIO master container)
+│   ├── openclaw/                    # AI assistant gateway
+│   ├── actual-budget/               # Personal finance
+│   ├── uptime-kuma/                 # Service monitoring
+│   ├── vaultwarden/                 # Password manager (Bitwarden-compatible)
+│   └── watchtower/                  # Automatic container image updates
+├── docs/                            # Rebuild and operations documentation
+│   ├── SETUP.md                     # Host bootstrap guide
+│   ├── NETWORKING.md                # Full networking model and troubleshooting
+│   ├── CLOUDFLARE.md                # Domain and certificate management
+│   ├── OPERATIONS.md                # Day-two ops, incident playbooks
+│   ├── VARIABLES.md                 # Placeholder variables reference
+│   └── stacks/                      # Per-stack deployment and recovery guides
+├── aerospace/                       # AeroSpace tiling WM config (macOS)
+├── nvim/                            # LazyVim-based Neovim config
+├── tmux/                            # Tmux configuration
+├── kitty/                           # Kitty terminal config
+└── zshrc/                           # Zsh config with lazy loading
+```
 
 ## Operating Model
 
