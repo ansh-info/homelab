@@ -2,6 +2,74 @@
 
 <!-- version list -->
 
+## v1.6.0 (2026-06-11)
+
+### Chores
+
+- Old example file
+  ([`9d9356f`](https://github.com/ansh-info/homelab/commit/9d9356f44b51134c1af2ca06cab140a172a3adb5))
+
+- Remove old colorschme for nvim
+  ([`ee88011`](https://github.com/ansh-info/homelab/commit/ee88011625712aede32fdb1d1c1c1f4031199305))
+
+- Update lazyvim json
+  ([`2e1ce7f`](https://github.com/ansh-info/homelab/commit/2e1ce7f3c8dcc9eee3963406df606aed697a8a42))
+
+### Continuous Integration
+
+- Add duplicati to compose validation matrix
+  ([`1d56a1b`](https://github.com/ansh-info/homelab/commit/1d56a1bdfc58ba6e17657e07206d3a6def45788f))
+
+### Documentation
+
+- Add duplicati to README and docs index
+  ([`f79172d`](https://github.com/ansh-info/homelab/commit/f79172dab9ec3e7007a3ecaec3c67fcbe476f8cf))
+
+- Add duplicati variables to VARIABLES.md
+  ([`7c496a7`](https://github.com/ansh-info/homelab/commit/7c496a70e791ced576c0fd28f230b97dbade1ef5))
+
+- Add inline documentation to actual-budget docker-compose
+  ([`ebcf1cb`](https://github.com/ansh-info/homelab/commit/ebcf1cb4e787a29d1482838ad11ed49dd1152d88))
+
+- Add inline documentation to immich docker-compose
+  ([`2d06371`](https://github.com/ansh-info/homelab/commit/2d063719e626f272061802c3aec793d5761db7fb))
+
+- Add inline documentation to jellyfin-arr-stack docker-compose
+  ([`5fdb649`](https://github.com/ansh-info/homelab/commit/5fdb6493abca2c9780da30f7435b8c69e6b4b874))
+
+- Add inline documentation to nextcloud-aio docker-compose
+  ([`a1710a6`](https://github.com/ansh-info/homelab/commit/a1710a6891f46d5b812902a34a3e6f105c8d5787))
+
+- Add inline documentation to nginx-proxy-manager docker-compose
+  ([`6376bb2`](https://github.com/ansh-info/homelab/commit/6376bb2e2df014286117710884cb8e2c5b4a4bb7))
+
+- Add inline documentation to openclaw docker-compose
+  ([`d36acc7`](https://github.com/ansh-info/homelab/commit/d36acc70383fc211a9d68e031d2d51ca2be7d922))
+
+- Add inline documentation to pihole docker-compose
+  ([`e49fc05`](https://github.com/ansh-info/homelab/commit/e49fc0570c4a554eac6e46c8fee487a1f891b074))
+
+- Add inline documentation to uptime-kuma docker-compose
+  ([`74c1f84`](https://github.com/ansh-info/homelab/commit/74c1f84c21d538ea5ff883d73407df06df0f58b0))
+
+- Add inline documentation to vaultwarden docker-compose
+  ([`3757837`](https://github.com/ansh-info/homelab/commit/37578379f777361774776eff405222cf841d1567))
+
+- Add inline documentation to watchtower docker-compose
+  ([`df431fa`](https://github.com/ansh-info/homelab/commit/df431faa105b4107dad05c73a10c51e797ffd578))
+
+- Add stack guide for duplicati
+  ([`5d9b69d`](https://github.com/ansh-info/homelab/commit/5d9b69d35ab359c4968884efff1625b526a54148))
+
+- Update CLAUDE.md and AGENTS.md stack lists for duplicati
+  ([`11886c3`](https://github.com/ansh-info/homelab/commit/11886c34be26d3b8c374fca6f0c5bccca409826a))
+
+### Features
+
+- Add duplicati stack for encrypted backups
+  ([`0471c09`](https://github.com/ansh-info/homelab/commit/0471c0935135a351ceccc2af9c08c197d40b2651))
+
+
 ## v1.5.0 (2026-06-08)
 
 ### Features
