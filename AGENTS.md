@@ -60,6 +60,7 @@ Current stack layout:
 - `docker-compose/nextcloud-aio`
 - `docker-compose/openclaw`
 - `docker-compose/actual-budget`
+- `docker-compose/duplicati`
 - `docker-compose/uptime-kuma`
 - `docker-compose/vaultwarden`
 - `docker-compose/watchtower`
